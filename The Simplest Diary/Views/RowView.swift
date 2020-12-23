@@ -10,29 +10,28 @@ import SwiftUI
 
 struct RowView: View {
     var entry: Entry
-    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(entry.date)
+            Text(entry.dateString)
                 .padding(.bottom, 5)
             Text(entry.text)
                 .multilineTextAlignment(.leading)
                 .font(.system(size: 20))
                 .lineLimit(5)
-
         }
-        .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading) //minHeight: 145
+        .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
         .padding()
-        .background(self.colorScheme == .dark ? Color.darkCardBackground : Color.lightCardBackground)
+        .background(Color("cardBackgroud"))
         .cornerRadius(15)
     }
 }
 
 struct RowView_Previews: PreviewProvider {
     static var previews: some View {
-        RowView(entry: entriesList[0])
-//        .environment(\.colorScheme, .dark)
+        let entries = Entries()
+        RowView(entry: entries.entriesList[0])
+        .environment(\.colorScheme, .dark)
     }
 }
 

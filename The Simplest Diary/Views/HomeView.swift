@@ -9,34 +9,47 @@
 import SwiftUI
 
 struct HomeView: View {
-    @Environment(\.colorScheme) var colorScheme
-    var entries = entriesList
-    
-    init() {
-       UITableView.appearance().separatorStyle = .none
-    }
-    
+    @ObservedObject var entries = Entries()
+ 
     var body: some View {
-        
         NavigationView {
-            List(entries, id: \.date) { entry in
-                RowView(entry: entry)
-                NavigationLink(destination: EntryView(entry: entry.text)) {
-                    EmptyView()
-                }.hidden().frame(width: 0)
-                
+            ScrollView(.vertical) {
+                VStack {
+                    ForEach(entries.entriesList.reversed(), id: \.self) { entry in
+                        NavigationLink(destination: SelectedEntryView(entry: self.$entries.entriesList[self.entries.entriesList.firstIndex(of: entry)!])) {
+                            RowView(entry: entry)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }.onDelete(perform: { indexSet in
+                        entries.entriesList.remove(atOffsets: indexSet)
+                        print(indexSet)
+                    })
+                }
             }
-                .navigationBarTitle("Entries")
-                .navigationBarHidden(false)
-            .background(colorScheme == .dark ? Color.black : Color.white)
+            .padding()
+            .navigationBarTitle("Entries")
+            .navigationBarItems(leading:
+                                    NavigationLink(destination: SettingsView()) {
+                                        Image(systemName: "gear")
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                    },
+                                trailing:
+                                    NavigationLink(destination: AddNewEntryView(entries: $entries.entriesList)) {
+                                        Image(systemName: "square.and.pencil")
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                    })
         }
     }
 }
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView()
-        .environment(\.colorScheme, .dark)
+        Group {
+            HomeView()
+        }
+//        .environment(\.colorScheme, .dark)
     }
 }
 
