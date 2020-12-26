@@ -16,9 +16,16 @@ struct Entry: Hashable {
 
 class Entries: ObservableObject {
     @Published var entriesList: [Entry] = [
-        Entry(text: "Example", date: 5776565678, dateString: "2020-12-23 19:22:06"),
-        Entry(text: "Example 2", date: 4545624256, dateString: "2020-12-25 19:22:06")
+        Entry(text: "Example", date: 978307200.0, dateString: "Thursday, December 24, 2020 at 8:56 PM"),
+        Entry(text: "Example2", date: 978307200.0, dateString: "Thursday, December 24, 2020 at 8:56 PM")
     ]
+    
+    @Published var deletedEntriesList: [Entry] = []
+    
+    func moveTotrash(entry: Entry, index: Int) {
+        deletedEntriesList.append(entry)
+        entriesList.remove(at: index)
+    }
     
     func addNewEntry(entry: Entry) {
         entriesList.append(entry)

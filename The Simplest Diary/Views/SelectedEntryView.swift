@@ -7,31 +7,28 @@
 //
 
 import SwiftUI
+@available(iOS 14.0, *)
 
 struct SelectedEntryView: View {
     @Binding var entry: Entry
     @State var onEdit = false
-    @State private var entryText: String = ""
+    @State var entryText: String = ""
     @State private var showAlert = false
     
     var body: some View {
         VStack {
-                if onEdit {
-                    if #available(iOS 14.0, *) {
-                        TextEditor(text: $entryText)
-                            .autocapitalization(.sentences)
-                            .onChange(of: entryText, perform: { value in
-                                self.entryText = entryText
-                            })
-                    } else {
-                        // Fallback on earlier versions
-                    }
-                } else {
-                    ScrollView {
-                        Text(entry.text)
-                    }
+            if onEdit {
+                TextEditor(text: $entryText)
+                    .autocapitalization(.sentences)
+                    .onChange(of: entryText, perform: { value in
+                        self.entryText = entryText
+                    })
+            } else {
+                ScrollView {
+                    Text(entry.text)
                 }
-                Spacer()
+            }
+            Spacer()
         }
         .navigationBarTitle("", displayMode: .inline)
         .navigationBarItems(trailing: Button(action: {
@@ -41,8 +38,8 @@ struct SelectedEntryView: View {
             Text(onEdit ? "Save" : "Edit")
         })
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("Do you want to delete this etry?"), primaryButton: .destructive(Text("Delete"), action: {
-                deleteEntry()
+            Alert(title: Text("Do you want to save empty etry?"), primaryButton: .destructive(Text("Yes"), action: {
+                saveEmptyEntry()
             }), secondaryButton: .cancel())
         }
         .padding()
@@ -60,11 +57,12 @@ struct SelectedEntryView: View {
         }
     }
     
-    private func deleteEntry() {
-        
+    private func saveEmptyEntry() {
+        entry.text = entryText
     }
 }
 
+@available(iOS 14.0, *)
 struct EntryView_Previews: PreviewProvider {
     static var previews: some View {
         SelectedEntryView(entry: .constant(Entry(text: "hhh", date: 999, dateString: "")))
