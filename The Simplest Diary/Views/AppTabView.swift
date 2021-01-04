@@ -36,6 +36,7 @@ struct AppTabView: View {
 @available(iOS 14.0, *)
 struct TabView_Previews: PreviewProvider {
     static var previews: some View {
-        AppTabView()
+//        AppTabView()
+        EmptyView()
     }
 }

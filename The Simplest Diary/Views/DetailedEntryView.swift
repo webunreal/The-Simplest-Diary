@@ -1,5 +1,5 @@
 //
-//  SelectedEntryView.swift
+//  DetailedEntryView.swift
 //  The Simplest Diary
 //
 //  Created by Nikolai Ivanov on 06.08.2020.
@@ -9,8 +9,9 @@
 import SwiftUI
 @available(iOS 14.0, *)
 
-struct SelectedEntryView: View {
-    @Binding var entry: Entry
+struct DetailedEntryView: View {
+    @EnvironmentObject var entries: Entries
+    var index: Int
     @State var onEdit = false
     @State var entryText: String = ""
     @State private var showAlert = false
@@ -24,8 +25,8 @@ struct SelectedEntryView: View {
                         self.entryText = entryText
                     })
             } else {
-                ScrollView {
-                    Text(entry.text)
+                ScrollView(.vertical) {
+                    Text(entries.entriesList[index].text)
                 }
             }
             Spacer()
@@ -46,26 +47,26 @@ struct SelectedEntryView: View {
     }
     
     private func editEntry() {
-        entryText = entry.text
+        entryText = entries.entriesList[index].text
     }
     
     private func saveEntry() {
         if !entryText.isEmpty {
-            entry.text = entryText
+            entries.entriesList[index].text = entryText
         } else {
             self.showAlert = true
         }
     }
     
     private func saveEmptyEntry() {
-        entry.text = entryText
+        entries.entriesList[index].text = entryText
     }
 }
 
 @available(iOS 14.0, *)
 struct EntryView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectedEntryView(entry: .constant(Entry(text: "hhh", date: 999, dateString: "")))
+        DetailedEntryView(index: 0)
         //        .environment(\.colorScheme, .dark)
     }
 }

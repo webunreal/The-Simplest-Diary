@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct AddNewEntryView: View {
-    @Binding var entries: [Entry]
+    @EnvironmentObject var entries: Entries
     @State private var entryText: String = "Write something..."
     @Environment(\.presentationMode) var presentation
     private let placeholder = "Write something..."
@@ -42,22 +42,16 @@ struct AddNewEntryView: View {
         if entryText.isEmpty {
             self.presentation.wrappedValue.dismiss()
         } else {
-            let entry: Entry = Entry(text: entryText, date: NSTimeIntervalSince1970, dateString: makeDate())
-            entries.append(entry)
+            let entry: Entry = Entry(text: entryText, date: Date(), offset: 0, isSwiped: false)
+            entries.addNewEntry(entry: entry)
             self.presentation.wrappedValue.dismiss()
         }
-    }
-    
-    private func makeDate() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEEE, MMMM d, yyyy 'at' h:mm a"
-        return dateFormatter.string(from: Date())
     }
 }
 
 @available(iOS 14.0, *)
 struct AddNewEntryView_Previews: PreviewProvider {
     static var previews: some View {
-        AddNewEntryView(entries: .constant([Entry(text: "", date: 999, dateString: "")]))
+        AddNewEntryView()
     }
 }
