@@ -12,7 +12,7 @@ struct MenuButtonView: View {
     var body: some View {
         Image(systemName: "ellipsis.circle")
             .foregroundColor(Color("menuColor"))
-            .frame(width: 30, height: 80)
+            .frame(maxWidth: 40, minHeight: 80)
     }
 }
 
