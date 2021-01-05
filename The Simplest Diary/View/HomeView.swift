@@ -10,7 +10,9 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct HomeView: View {
-    @EnvironmentObject var entries: Entries
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
+    
     @State var selectedEntry: Int?
     @State private var onEdit = false
     
@@ -18,11 +20,11 @@ struct HomeView: View {
         NavigationView {
             GeometryReader { geometry in
                 ScrollView(.vertical) {
-                    if !entries.entriesList.isEmpty {
+                    if !entries.filter({!$0.isTrashed}).isEmpty {
                         LazyVStack {
-                            ForEach(entries.entriesList.reversed(), id: \.id) { entry in
-                                if let index = entries.entriesList.firstIndex(of: entry) {
-                                    NavigationLink(destination:                           DetailedEntryView(index: index, onEdit: onEdit, entryText: entries.entriesList[index].text), tag: index, selection: $selectedEntry) {
+                            ForEach(entries.filter({!$0.isTrashed}).sorted(by: { $0.date! > $1.date! }), id: \.self) { entry in
+                                if let index = entries.firstIndex(of: entry) {
+                                    NavigationLink(destination:                           DetailedEntryView(index: index, onEdit: onEdit, entryText: entries[index].text ?? "error"), tag: index, selection: $selectedEntry) {
                                         HStack(spacing: 0) {
                                             ZStack {
                                                 LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
@@ -32,7 +34,7 @@ struct HomeView: View {
                                                     Spacer()
                                                     Button(action: {
                                                         withAnimation(.easeIn) {
-                                                            entries.moveTotrash(index: index)
+                                                            moveToTrash(index: index)
                                                         }
                                                     }) {
                                                         Image(systemName: "trash")
@@ -42,9 +44,9 @@ struct HomeView: View {
                                                     }
                                                 }
                                                 .opacity(-Double(entry.offset) / 90)
-                                                RowView(entry: entries.entriesList[index])
+                                                RowView(entry: entries[index])
                                                     .contentShape(Rectangle())
-                                                    .offset(x: entry.offset)
+                                                    .offset(x: CGFloat(entry.offset))
                                                     .gesture(DragGesture()
                                                                 .onChanged({ value in
                                                                     onChanged(value: value, index: index)
@@ -64,7 +66,7 @@ struct HomeView: View {
                                                     }
                                                     Button(action: {
                                                         withAnimation(.easeIn) {
-                                                            entries.moveTotrash(index: index)
+                                                            moveToTrash(index: index)
                                                         }
                                                     }) {
                                                         Label("Move to Trash", systemImage: "trash")
@@ -74,7 +76,6 @@ struct HomeView: View {
                                                     MenuButtonView()
                                                 }
                                             })
-                                            
                                         }
                                     }
                                     .padding(.bottom, 1)
@@ -96,18 +97,39 @@ struct HomeView: View {
                             .frame(width: geometry.size.width)
                             .frame(minHeight: geometry.size.height)
                             .navigationBarTitle("Entries")
+                            .navigationBarItems(
+                                trailing:
+                                    NavigationLink(destination: AddNewEntryView()) {
+                                        Image(systemName: "square.and.pencil")
+                                            .resizable()
+                                            .frame(width: 25, height: 25)
+                                    })
                     }
                 }
             }
         }
     }
     
+    private func moveToTrash(index: Int) {
+        entries[index].isTrashed = true
+        entries[index].offset = 0
+        saveContext()
+    }
+    
+    private func saveContext() {
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
+        }
+    }
+    
     private func onChanged(value: DragGesture.Value, index: Int) {
         if value.translation.width < 0 {
-            if entries.entriesList[index].isSwiped {
-                entries.entriesList[index].offset = value.translation.width - 90
+            if entries[index].isSwiped {
+                entries[index].offset = Float(value.translation.width - 90)
             } else {
-                entries.entriesList[index].offset = value.translation.width
+                entries[index].offset = Float(value.translation.width)
             }
         }
     }
@@ -116,18 +138,18 @@ struct HomeView: View {
         withAnimation(.easeOut) {
             if value.translation.width < 0 {
                 if -value.translation.width > UIScreen.main.bounds.width / 2 {
-                    entries.entriesList[index].offset = -1000
-                    entries.moveTotrash(index: index)
-                } else if -entries.entriesList[index].offset > 50 {
-                    entries.entriesList[index].isSwiped = true
-                    entries.entriesList[index].offset = -90
+                    entries[index].offset = -1000
+                    moveToTrash(index: index)
+                } else if -entries[index].offset > 50 {
+                    entries[index].isSwiped = true
+                    entries[index].offset = -90
                 } else {
-                    entries.entriesList[index].isSwiped = false
-                    entries.entriesList[index].offset = 0
+                    entries[index].isSwiped = false
+                    entries[index].offset = 0
                 }
             } else {
-                entries.entriesList[index].isSwiped = false
-                entries.entriesList[index].offset = 0
+                entries[index].isSwiped = false
+                entries[index].offset = 0
             }
         }
     }

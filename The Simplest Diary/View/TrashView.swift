@@ -10,18 +10,18 @@ import SwiftUI
 
 @available(iOS 14.0, *)
 struct TrashView: View {
-    @EnvironmentObject var entries: Entries
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
     
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
                 ScrollView(.vertical) {
-                    if !entries.trashedEntriesList.isEmpty {
+                    if !entries.filter({$0.isTrashed}).isEmpty {
                         LazyVStack {
-                            ForEach(entries.trashedEntriesList.reversed(), id: \.id) { entry in
-                                if let index = entries.trashedEntriesList.firstIndex(of: entry) {
-                                    NavigationLink(
-                                        destination: TrashedEntryView(index: index)) {
+                            ForEach(entries.filter({$0.isTrashed}).sorted(by: { $0.date! > $1.date! }), id: \.self) { entry in
+                                if let index = entries.firstIndex(of: entry) {
+                                    NavigationLink(destination: TrashedEntryView(index: index)) {
                                         HStack(spacing: 0) {
                                             ZStack {
                                                 LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
@@ -31,7 +31,7 @@ struct TrashView: View {
                                                     Spacer()
                                                     Button(action: {
                                                         withAnimation(.easeIn) {
-                                                            entries.deleteOneEntryFromTrash(index: index)
+                                                            deleteOneEntryFromTrash(index: index)
                                                         }
                                                     }) {
                                                         Image(systemName: "trash")
@@ -41,9 +41,9 @@ struct TrashView: View {
                                                     }
                                                 }
                                                 .opacity(-Double(entry.offset) / 90)
-                                                RowView(entry: entries.trashedEntriesList[index])
+                                                RowView(entry: entries[index])
                                                     .contentShape(Rectangle())
-                                                    .offset(x: entry.offset)
+                                                    .offset(x: CGFloat(entry.offset))
                                                     .gesture(DragGesture()
                                                                 .onChanged({ value in
                                                                     onChanged(value: value, index: index)
@@ -53,19 +53,18 @@ struct TrashView: View {
                                                                 })
                                                     )
                                             }
-                                            Button(action: {
-                                            }, label: {
+                                            Button(action: {}, label: {
                                                 Menu {
                                                     Button(action: {
                                                         withAnimation(.easeIn) {
-                                                            entries.recoverOneEntryFromTrash(index: index)
+                                                            recoverOneEntryFromTrash(index: index)
                                                         }
                                                     }) {
                                                         Label("Recover", systemImage: "arrow.clockwise")
                                                     }
                                                     Button(action: {
                                                         withAnimation(.easeIn) {
-                                                            entries.deleteOneEntryFromTrash(index: index)
+                                                            deleteOneEntryFromTrash(index: index)
                                                         }
                                                     }) {
                                                         Label("Delete", systemImage: "trash")
@@ -88,7 +87,7 @@ struct TrashView: View {
                             leading:
                                 Button(action: {
                                     withAnimation(.easeIn) {
-                                        entries.deleteAllEntriesFromTrash()
+                                        deleteAllEntriesFromTrash()
                                     }
                                 }) {
                                     Text("Delete all")
@@ -97,7 +96,7 @@ struct TrashView: View {
                             trailing:
                                 Button(action: {
                                     withAnimation(.easeIn) {
-                                        entries.recoverAllEntriesFromTrash()
+                                        recoverAllEntriesFromTrash()
                                     }
                                 }) {
                                     Text("Recover all")
@@ -120,12 +119,44 @@ struct TrashView: View {
         }
     }
     
+    private func recoverOneEntryFromTrash(index: Int) {
+        entries[index].isTrashed = false
+        saveContext()
+    }
+    
+    private func deleteOneEntryFromTrash(index: Int) {
+        self.managedObjectContext.delete(entries[index])
+        saveContext()
+    }
+    
+    private func deleteAllEntriesFromTrash() {
+        for entry in entries where entry.isTrashed {
+            self.managedObjectContext.delete(entry)
+        }
+        saveContext()
+    }
+    
+    private func recoverAllEntriesFromTrash() {
+        for entry in entries where entry.isTrashed {
+            entry.isTrashed = false
+        }
+        saveContext()
+    }
+    
+    private func saveContext() {
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
+        }
+    }
+    
     private func onChanged(value: DragGesture.Value, index: Int) {
         if value.translation.width < 0 {
-            if entries.trashedEntriesList[index].isSwiped {
-                entries.trashedEntriesList[index].offset = value.translation.width - 90
+            if entries[index].isSwiped {
+                entries[index].offset = Float(value.translation.width - 90)
             } else {
-                entries.trashedEntriesList[index].offset = value.translation.width
+                entries[index].offset = Float(value.translation.width)
             }
         }
     }
@@ -134,18 +165,18 @@ struct TrashView: View {
         withAnimation(.easeOut) {
             if value.translation.width < 0 {
                 if -value.translation.width > UIScreen.main.bounds.width / 2 {
-                    entries.trashedEntriesList[index].offset = -1000
-                    entries.deleteOneEntryFromTrash(index: index)
-                } else if -entries.trashedEntriesList[index].offset > 50 {
-                    entries.trashedEntriesList[index].isSwiped = true
-                    entries.trashedEntriesList[index].offset = -90
+                    entries[index].offset = -1000
+                    deleteOneEntryFromTrash(index: index)
+                } else if -entries[index].offset > 50 {
+                    entries[index].isSwiped = true
+                    entries[index].offset = -90
                 } else {
-                    entries.trashedEntriesList[index].isSwiped = false
-                    entries.trashedEntriesList[index].offset = 0
+                    entries[index].isSwiped = false
+                    entries[index].offset = 0
                 }
             } else {
-                entries.trashedEntriesList[index].isSwiped = false
-                entries.trashedEntriesList[index].offset = 0
+                entries[index].isSwiped = false
+                entries[index].offset = 0
             }
         }
     }

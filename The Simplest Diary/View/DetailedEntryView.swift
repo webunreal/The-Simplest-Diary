@@ -10,7 +10,9 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct DetailedEntryView: View {
-    @EnvironmentObject var entries: Entries
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
+    @Environment(\.presentationMode) var presentation
     var index: Int
     @State var onEdit = false
     @State var entryText: String = ""
@@ -26,7 +28,7 @@ struct DetailedEntryView: View {
                     })
             } else {
                 ScrollView(.vertical) {
-                    Text(entries.entriesList[index].text)
+                    Text(entries[index].text ?? "Error")
                 }
             }
             Spacer()
@@ -38,28 +40,25 @@ struct DetailedEntryView: View {
         }) {
             Text(onEdit ? "Save" : "Edit")
         })
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("Do you want to save empty etry?"), primaryButton: .destructive(Text("Yes"), action: {
-                saveEmptyEntry()
-            }), secondaryButton: .cancel())
-        }
         .padding()
     }
     
     private func editEntry() {
-        entryText = entries.entriesList[index].text
+        entryText = entries[index].text ?? "Error"
     }
     
     private func saveEntry() {
-        if !entryText.isEmpty {
-            entries.entriesList[index].text = entryText
-        } else {
-            self.showAlert = true
-        }
+        entries[index].text = entryText
+        saveContext()
     }
     
-    private func saveEmptyEntry() {
-        entries.entriesList[index].text = entryText
+    private func saveContext() {
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
+        }
+        self.presentation.wrappedValue.dismiss()
     }
 }
 

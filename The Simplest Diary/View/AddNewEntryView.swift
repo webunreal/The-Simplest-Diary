@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct AddNewEntryView: View {
-    @EnvironmentObject var entries: Entries
+    @Environment(\.managedObjectContext) var managedObjectContext
     @State private var entryText: String = "Write something..."
     @Environment(\.presentationMode) var presentation
     private let placeholder = "Write something..."
@@ -31,19 +31,29 @@ struct AddNewEntryView: View {
         }
         .navigationBarTitle("", displayMode: .inline)
         .navigationBarItems(trailing: Button(action: {
-            saveButtonActions()
+            saveEntry()
         }) {
             Text("Save")
         })
         .padding()
     }
     
-    private func saveButtonActions() {
+    private func saveEntry() {
         if entryText.isEmpty {
             self.presentation.wrappedValue.dismiss()
         } else {
-            let entry: Entry = Entry(text: entryText, date: Date(), offset: 0, isSwiped: false)
-            entries.addNewEntry(entry: entry)
+            let newEntry = Entry(context: self.managedObjectContext)
+            newEntry.text = entryText
+            newEntry.date = Date()
+            newEntry.isTrashed = false
+            newEntry.offset = 0
+            newEntry.isSwiped = false
+            
+            do {
+                try managedObjectContext.save()
+            } catch {
+                print("Error saving managed object context: \(error)")
+            }
             self.presentation.wrappedValue.dismiss()
         }
     }
