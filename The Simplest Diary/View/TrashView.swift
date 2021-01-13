@@ -13,6 +13,10 @@ struct TrashView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
     
+    @State private var showAlertDeleteAllEntries = false
+    @State private var showAlertDeleteOneEntry = false
+    @State private var deletingEntry: Entry? = nil
+    
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
@@ -20,65 +24,63 @@ struct TrashView: View {
                     if !entries.filter({$0.isTrashed}).isEmpty {
                         LazyVStack {
                             ForEach(entries.filter({$0.isTrashed}).sorted(by: { $0.date! > $1.date! }), id: \.self) { entry in
-                                if let index = entries.firstIndex(of: entry) {
-                                    NavigationLink(destination: TrashedEntryView(index: index)) {
+                                NavigationLink(destination: TrashedEntryView(entry: entry)) {
+                                    ZStack {
+                                        LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
+                                            .cornerRadius(15)
+                                            .opacity(-Double(entry.offset) / 180)
                                         HStack(spacing: 0) {
+                                            Spacer()
                                             ZStack {
-                                                LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
+                                                LinearGradient(gradient: .init(colors: [Color(.clear), Color(.blue)]), startPoint: .leading, endPoint: .trailing)
                                                     .cornerRadius(15)
-                                                    .opacity(-Double(entry.offset) / 90)
-                                                HStack {
+                                                HStack(spacing: 0) {
                                                     Spacer()
                                                     Button(action: {
                                                         withAnimation(.easeIn) {
-                                                            deleteOneEntryFromTrash(index: index)
+                                                            recoverOneEntryFromTrash(entry: entry)
                                                         }
                                                     }) {
-                                                        Image(systemName: "trash")
+                                                        Image(systemName: "arrow.clockwise")
                                                             .font(.title)
                                                             .foregroundColor(.white)
-                                                            .frame(width: 90, height: 50)
+                                                            .frame(width: 90, height: 80)
                                                     }
                                                 }
-                                                .opacity(-Double(entry.offset) / 90)
-                                                RowView(entry: entries[index])
-                                                    .contentShape(Rectangle())
-                                                    .offset(x: CGFloat(entry.offset))
-                                                    .gesture(DragGesture()
-                                                                .onChanged({ value in
-                                                                    onChanged(value: value, index: index)
-                                                                })
-                                                                .onEnded({value in
-                                                                    onEnded(value: value, index: index)
-                                                                })
-                                                    )
                                             }
-                                            Button(action: {}, label: {
-                                                Menu {
-                                                    Button(action: {
-                                                        withAnimation(.easeIn) {
-                                                            recoverOneEntryFromTrash(index: index)
-                                                        }
-                                                    }) {
-                                                        Label("Recover", systemImage: "arrow.clockwise")
+                                            Button(action: {
+                                                self.deletingEntry = entry
+                                                self.showAlertDeleteOneEntry = true
+                                            }) {
+                                                Image(systemName: "trash")
+                                                    .font(.title)
+                                                    .foregroundColor(.white)
+                                                    .frame(width: 90, height: 80)
+                                            }
+                                            .alert(isPresented: $showAlertDeleteOneEntry) {
+                                                Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Yes"), action: {
+                                                    if let entry = deletingEntry {
+                                                        deleteOneEntryFromTrash(entry: entry)
                                                     }
-                                                    Button(action: {
-                                                        withAnimation(.easeIn) {
-                                                            deleteOneEntryFromTrash(index: index)
-                                                        }
-                                                    }) {
-                                                        Label("Delete", systemImage: "trash")
-                                                    }
-                                                }
-                                                label: {
-                                                    MenuButtonView()
-                                                }
-                                            })
+                                                }), secondaryButton: .cancel())
+                                            }
                                         }
+                                        .opacity(-Double(entry.offset) / 180)
+                                        RowView(date: entry.date ?? Date(), text: entry.text ?? "Error")
+                                            .contentShape(Rectangle())
+                                            .offset(x: CGFloat(entry.offset))
+                                            .gesture(DragGesture()
+                                                        .onChanged({ value in
+                                                            onChanged(value: value, entry: entry)
+                                                        })
+                                                        .onEnded({value in
+                                                            onEnded(value: value, entry: entry)
+                                                        })
+                                            )
                                     }
-                                    .padding(.bottom, 1)
-                                    .buttonStyle(PlainButtonStyle())
                                 }
+                                .padding(.bottom, 1)
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding()
@@ -86,12 +88,15 @@ struct TrashView: View {
                         .navigationBarItems(
                             leading:
                                 Button(action: {
-                                    withAnimation(.easeIn) {
-                                        deleteAllEntriesFromTrash()
-                                    }
+                                    self.showAlertDeleteAllEntries = true
                                 }) {
                                     Text("Delete all")
                                         .foregroundColor(.red)
+                                }
+                                .alert(isPresented: $showAlertDeleteAllEntries) {
+                                    Alert(title: Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Yes"), action: {
+                                        deleteAllEntriesFromTrash()
+                                    }), secondaryButton: .cancel())
                                 },
                             trailing:
                                 Button(action: {
@@ -119,28 +124,30 @@ struct TrashView: View {
         }
     }
     
-    private func recoverOneEntryFromTrash(index: Int) {
-        entries[index].isTrashed = false
+    private func recoverOneEntryFromTrash(entry: Entry) {
+        entry.isTrashed = false
+        entry.offset = 0
+        entry.isSwiped = false
+        
         saveContext()
     }
     
-    private func deleteOneEntryFromTrash(index: Int) {
-        self.managedObjectContext.delete(entries[index])
+    private func deleteOneEntryFromTrash(entry : Entry) {
+        self.managedObjectContext.delete(entry)
+        
         saveContext()
     }
     
     private func deleteAllEntriesFromTrash() {
-        for entry in entries where entry.isTrashed {
-            self.managedObjectContext.delete(entry)
+        for entry in entries.filter({$0.isTrashed}) {
+            deleteOneEntryFromTrash(entry: entry)
         }
-        saveContext()
     }
     
     private func recoverAllEntriesFromTrash() {
-        for entry in entries where entry.isTrashed {
-            entry.isTrashed = false
+        for entry in entries.filter({$0.isTrashed}) {
+            recoverOneEntryFromTrash(entry: entry)
         }
-        saveContext()
     }
     
     private func saveContext() {
@@ -151,32 +158,34 @@ struct TrashView: View {
         }
     }
     
-    private func onChanged(value: DragGesture.Value, index: Int) {
+    private func onChanged(value: DragGesture.Value, entry: Entry) {
         if value.translation.width < 0 {
-            if entries[index].isSwiped {
-                entries[index].offset = Float(value.translation.width - 90)
+            if entry.isSwiped {
+                entry.offset = Float(value.translation.width - 180)
             } else {
-                entries[index].offset = Float(value.translation.width)
+                entry.offset = Float(value.translation.width)
             }
         }
     }
     
-    private func onEnded(value: DragGesture.Value, index: Int) {
+    private func onEnded(value: DragGesture.Value, entry: Entry) {
         withAnimation(.easeOut) {
             if value.translation.width < 0 {
                 if -value.translation.width > UIScreen.main.bounds.width / 2 {
-                    entries[index].offset = -1000
-                    deleteOneEntryFromTrash(index: index)
-                } else if -entries[index].offset > 50 {
-                    entries[index].isSwiped = true
-                    entries[index].offset = -90
+                    entry.offset = -1000
+                    self.deletingEntry = entry
+                    self.showAlertDeleteOneEntry = true
+                    entry.offset = 0
+                } else if -entry.offset > 50 {
+                    entry.isSwiped = true
+                    entry.offset = -180
                 } else {
-                    entries[index].isSwiped = false
-                    entries[index].offset = 0
+                    entry.isSwiped = false
+                    entry.offset = 0
                 }
             } else {
-                entries[index].isSwiped = false
-                entries[index].offset = 0
+                entry.isSwiped = false
+                entry.offset = 0
             }
         }
     }

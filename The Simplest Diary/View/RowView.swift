@@ -11,8 +11,8 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct RowView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
-    var entry: Entry
+    var date: Date
+    var text: String    
     private static let dateFormat: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .full
@@ -23,10 +23,10 @@ struct RowView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(entry.date ?? Date(), formatter: RowView.dateFormat)
+            Text(date, formatter: RowView.dateFormat)
                 .font(.system(size: 15))
                 .padding(.bottom, 5)
-            Text(entry.text ?? "Error")
+            Text(text)
                 .multilineTextAlignment(.leading)
                 .font(.system(size: 20))
                 .lineLimit(5)
@@ -38,11 +38,11 @@ struct RowView: View {
     }
 }
 
-//@available(iOS 14.0, *)
-//struct RowView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        RowView(entry: Entry)
-//            .environment(\.colorScheme, .dark)
-//    }
-//}
+@available(iOS 14.0, *)
+struct RowView_Previews: PreviewProvider {
+    static var previews: some View {
+        RowView(date: Date(), text: "text")
+            .environment(\.colorScheme, .dark)
+    }
+}
 

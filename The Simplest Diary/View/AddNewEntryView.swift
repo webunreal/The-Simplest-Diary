@@ -43,18 +43,24 @@ struct AddNewEntryView: View {
             self.presentation.wrappedValue.dismiss()
         } else {
             let newEntry = Entry(context: self.managedObjectContext)
+            newEntry.id = UUID()
             newEntry.text = entryText
             newEntry.date = Date()
-            newEntry.isTrashed = false
             newEntry.offset = 0
             newEntry.isSwiped = false
+            newEntry.isTrashed = false
             
-            do {
-                try managedObjectContext.save()
-            } catch {
-                print("Error saving managed object context: \(error)")
-            }
+            saveContext()
+            
             self.presentation.wrappedValue.dismiss()
+        }
+    }
+    
+    private func saveContext() {
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
         }
     }
 }

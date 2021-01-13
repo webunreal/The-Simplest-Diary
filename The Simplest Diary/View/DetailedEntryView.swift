@@ -10,11 +10,10 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct DetailedEntryView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
-    @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
     @Environment(\.presentationMode) var presentation
-    var index: Int
-    @State var onEdit = false
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @ObservedObject var entry: Entry
+    @State private var onEdit = false
     @State var entryText: String = ""
     @State private var showAlert = false
     
@@ -28,7 +27,7 @@ struct DetailedEntryView: View {
                     })
             } else {
                 ScrollView(.vertical) {
-                    Text(entries[index].text ?? "Error")
+                    Text(entry.text ?? "Error")
                 }
             }
             Spacer()
@@ -40,16 +39,26 @@ struct DetailedEntryView: View {
         }) {
             Text(onEdit ? "Save" : "Edit")
         })
+        .alert(isPresented: $showAlert) {
+                    Alert(title: Text("Do you want to save empty entry?"), primaryButton: .destructive(Text("Yes"), action: {
+                        entry.text = ""
+                        saveContext()
+                    }), secondaryButton: .cancel())
+                }
         .padding()
     }
     
     private func editEntry() {
-        entryText = entries[index].text ?? "Error"
+        entryText = entry.text ?? "Error"
     }
     
     private func saveEntry() {
-        entries[index].text = entryText
-        saveContext()
+        if !entryText.isEmpty {
+            entry.text = entryText
+            saveContext()
+        } else {
+            self.showAlert = true
+        }
     }
     
     private func saveContext() {
@@ -58,14 +67,14 @@ struct DetailedEntryView: View {
         } catch {
             print("Error saving managed object context: \(error)")
         }
+        
         self.presentation.wrappedValue.dismiss()
     }
 }
 
-@available(iOS 14.0, *)
-struct EntryView_Previews: PreviewProvider {
-    static var previews: some View {
-        DetailedEntryView(index: 0)
-        //        .environment(\.colorScheme, .dark)
-    }
-}
+//@available(iOS 14.0, *)
+//struct EntryView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        DetailedEntryView()
+//    }
+//}

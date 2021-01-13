@@ -24,9 +24,9 @@
 		6073A3702597212400D369A3 /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6073A36F2597212400D369A3 /* TrashView.swift */; };
 		6073A378259734CC00D369A3 /* TrashedEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6073A377259734CC00D369A3 /* TrashedEntryView.swift */; };
 		608C8AE525952CF800AE023B /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608C8AE425952CF800AE023B /* AppTabView.swift */; };
-		60955974259CD57E00FFCE0B /* MenuButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60955973259CD57E00FFCE0B /* MenuButtonView.swift */; };
 		60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 60AA5E9A25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld */; };
 		60AA5EE925A37CD4002D7786 /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AA5EE825A37CD4002D7786 /* HomeKit.framework */; };
+		60DD0DB725AE2FC70030970F /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DB625AE2FC70030970F /* CornerRadius.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,9 +70,9 @@
 		6073A36F2597212400D369A3 /* TrashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashView.swift; sourceTree = "<group>"; };
 		6073A377259734CC00D369A3 /* TrashedEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashedEntryView.swift; sourceTree = "<group>"; };
 		608C8AE425952CF800AE023B /* AppTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabView.swift; sourceTree = "<group>"; };
-		60955973259CD57E00FFCE0B /* MenuButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButtonView.swift; sourceTree = "<group>"; };
 		60AA5E9B25A372AC002D7786 /* TheSimplestDiary.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TheSimplestDiary.xcdatamodel; sourceTree = "<group>"; };
 		60AA5EE825A37CD4002D7786 /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = System/Library/Frameworks/HomeKit.framework; sourceTree = SDKROOT; };
+		60DD0DB625AE2FC70030970F /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,12 +108,11 @@
 				60598B6524E1D8DD00A36C62 /* RowView.swift */,
 				60356CED24DC658B00DC25C4 /* HomeView.swift */,
 				6073A36F2597212400D369A3 /* TrashView.swift */,
+				60356CEF24DC6B0E00DC25C4 /* DetailedEntryView.swift */,
 				6073A377259734CC00D369A3 /* TrashedEntryView.swift */,
 				6063582F24E321B500B7D78D /* SettingsView.swift */,
-				60356CEF24DC6B0E00DC25C4 /* DetailedEntryView.swift */,
 				60356CF324DC743000DC25C4 /* AddNewEntryView.swift */,
 				600A261D259A603400044FB2 /* NoEntriesView.swift */,
-				60955973259CD57E00FFCE0B /* MenuButtonView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -150,6 +149,7 @@
 				605C025524D89B6300FBD7DD /* Assets.xcassets */,
 				605C025A24D89B6300FBD7DD /* LaunchScreen.storyboard */,
 				605C025D24D89B6300FBD7DD /* Info.plist */,
+				60DD0DB525AE2FA50030970F /* Extensions */,
 				605C025724D89B6300FBD7DD /* Preview Content */,
 			);
 			path = "The Simplest Diary";
@@ -187,6 +187,14 @@
 				60AA5EE825A37CD4002D7786 /* HomeKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		60DD0DB525AE2FA50030970F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				60DD0DB625AE2FC70030970F /* CornerRadius.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -322,9 +330,9 @@
 			files = (
 				60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */,
 				608C8AE525952CF800AE023B /* AppTabView.swift in Sources */,
+				60DD0DB725AE2FC70030970F /* CornerRadius.swift in Sources */,
 				605C025024D89B6000FBD7DD /* AppDelegate.swift in Sources */,
 				60356CEE24DC658B00DC25C4 /* HomeView.swift in Sources */,
-				60955974259CD57E00FFCE0B /* MenuButtonView.swift in Sources */,
 				60356CF024DC6B0E00DC25C4 /* DetailedEntryView.swift in Sources */,
 				60598B6624E1D8DD00A36C62 /* RowView.swift in Sources */,
 				6073A378259734CC00D369A3 /* TrashedEntryView.swift in Sources */,
@@ -498,7 +506,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "The Simplest Diary/The Simplest Diary.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"The Simplest Diary/Preview Content\"";
 				DEVELOPMENT_TEAM = JCV48HS79W;
@@ -519,7 +526,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "The Simplest Diary/The Simplest Diary.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"The Simplest Diary/Preview Content\"";
 				DEVELOPMENT_TEAM = JCV48HS79W;
