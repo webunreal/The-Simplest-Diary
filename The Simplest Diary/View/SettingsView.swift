@@ -12,7 +12,7 @@ import LocalAuthentication
 @available(iOS 14.0, *)
 struct SettingsView: View {
     @State private var showCreatePasscodeView: Bool = false
-    @State private var isFaceIDToggleShown: Bool = false
+    @AppStorage("isFaceIDToggleShown") private var isFaceIDToggleShown: Bool = false
     @AppStorage("isPasscodeUsed") private var isPasscodeUsed: Bool = false
     @AppStorage("isFaceIDUsed") private var isFaceIDUsed: Bool = false
     
