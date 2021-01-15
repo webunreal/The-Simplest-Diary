@@ -8,7 +8,6 @@
 
 import SwiftUI
 @available(iOS 14.0, *)
-
 struct AddNewEntryView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @State private var entryText: String = "Write something..."

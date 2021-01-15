@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CoreHaptics
 
 @available(iOS 14.0, *)
 struct TrashView: View {
@@ -16,6 +17,8 @@ struct TrashView: View {
     @State private var showAlertDeleteAllEntries = false
     @State private var showAlertDeleteOneEntry = false
     @State private var deletingEntry: Entry? = nil
+    
+    private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
     var body: some View {
         NavigationView {
@@ -151,6 +154,8 @@ struct TrashView: View {
     }
     
     private func saveContext() {
+        haptic.impactOccurred()
+        
         do {
             try managedObjectContext.save()
         } catch {

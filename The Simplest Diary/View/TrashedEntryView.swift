@@ -7,12 +7,16 @@
 //
 
 import SwiftUI
+import CoreHaptics
 
 @available(iOS 14.0, *)
 struct TrashedEntryView: View {
     @Environment(\.presentationMode) var presentation
     @Environment(\.managedObjectContext) var managedObjectContext
     @ObservedObject var entry: Entry
+    @State private var showAlertDeleteOneEntry: Bool = false
+    
+    private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
     var body: some View {
         ScrollView(.vertical) {
@@ -24,11 +28,16 @@ struct TrashedEntryView: View {
             trailing:
                 HStack(spacing: 40) {
                     Button(action: {
-                        deleteEntry()
-                        self.presentation.wrappedValue.dismiss()
+                        self.showAlertDeleteOneEntry = true
                     }) {
                         Text("Delete")
                             .foregroundColor(.red)
+                    }
+                    .alert(isPresented: $showAlertDeleteOneEntry) {
+                        Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Yes"), action: {
+                            deleteEntry()
+                            self.presentation.wrappedValue.dismiss()
+                        }), secondaryButton: .cancel())
                     }
                     Button(action: {
                         recoverEntry()
@@ -54,6 +63,8 @@ struct TrashedEntryView: View {
     }
     
     private func saveContext() {
+        haptic.impactOccurred()
+        
         do {
             try managedObjectContext.save()
         } catch {

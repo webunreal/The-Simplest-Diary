@@ -7,14 +7,57 @@
 //
 
 import SwiftUI
+import LocalAuthentication
 
+@available(iOS 14.0, *)
 struct SettingsView: View {
-
+    @State private var showCreatePasscodeView: Bool = false
+    @State private var isFaceIDToggleShown: Bool = false
+    @AppStorage("isPasscodeUsed") private var isPasscodeUsed: Bool = false
+    @AppStorage("isFaceIDUsed") private var isFaceIDUsed: Bool = false
+    
+    private let isFaceIDAvaliadle: () -> (Bool) = {
+        let context = LAContext()
+        var error: NSError?
+        
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     var body: some View {
-        Text("pipka")
+        NavigationView {
+            ZStack {
+                NavigationLink(destination: CreatePasscodeView(isPasscodeUsed: $isPasscodeUsed, isFaceIDToggleShown: $isFaceIDToggleShown), isActive: $showCreatePasscodeView) {}.hidden()
+                Form {
+                    Section(header: Text("Passcode")) {
+                        Toggle(isOn: $isPasscodeUsed) {
+                            Text("Use Passcode")
+                        }
+                        .onChange(of: isPasscodeUsed, perform: { value in
+                            if value {
+                                self.showCreatePasscodeView = true
+                            } else {
+                                self.isFaceIDUsed = false
+                            }
+                        })
+                        
+                        if (isFaceIDAvaliadle() && self.isPasscodeUsed && isFaceIDToggleShown) {
+                            Toggle(isOn: $isFaceIDUsed) {
+                                Text("Use FaceID")
+                            }
+                        }
+                    }
+                }
+                .navigationBarTitle("Settings")
+            }
+        }
     }
 }
 
+@available(iOS 14.0, *)
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()

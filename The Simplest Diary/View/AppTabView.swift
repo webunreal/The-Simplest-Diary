@@ -10,25 +10,31 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct AppTabView: View {
+    @State var isLogged: Bool = !UserDefaults.standard.bool(forKey: "isPasscodeUsed")
+    
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "pencil")
-                    Text("Entries")
-                }
-            
-            TrashView()
-                .tabItem {
-                    Image(systemName: "trash")
-                    Text("Trash")
-                }
-            
-            SettingsView()
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
-                }
+        if isLogged {
+            TabView {
+                HomeView()
+                    .tabItem {
+                        Image(systemName: "pencil")
+                        Text("Entries")
+                    }
+                
+                TrashView()
+                    .tabItem {
+                        Image(systemName: "trash")
+                        Text("Trash")
+                    }
+                
+                SettingsView()
+                    .tabItem {
+                        Image(systemName: "gear")
+                        Text("Settings")
+                    }
+            }
+        } else {
+            PasscodeView(isPasscodeCorrect: $isLogged)
         }
     }
 }
@@ -36,7 +42,7 @@ struct AppTabView: View {
 @available(iOS 14.0, *)
 struct TabView_Previews: PreviewProvider {
     static var previews: some View {
-//        AppTabView()
+        //        AppTabView()
         EmptyView()
     }
 }
