@@ -25,6 +25,7 @@
 		6073A378259734CC00D369A3 /* TrashedEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6073A377259734CC00D369A3 /* TrashedEntryView.swift */; };
 		607E594225B0DFF20096B947 /* CreatePasscodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607E594125B0DFF20096B947 /* CreatePasscodeView.swift */; };
 		608C8AE525952CF800AE023B /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608C8AE425952CF800AE023B /* AppTabView.swift */; };
+		608CAE6E25B23C8B00726DC1 /* ScrollViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608CAE6D25B23C8B00726DC1 /* ScrollViewExtension.swift */; };
 		60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 60AA5E9A25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld */; };
 		60AA5EE925A37CD4002D7786 /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AA5EE825A37CD4002D7786 /* HomeKit.framework */; };
 		60DD0DD925AF74E40030970F /* PassCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DD825AF74E40030970F /* PassCodeView.swift */; };
@@ -74,6 +75,7 @@
 		6073A377259734CC00D369A3 /* TrashedEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashedEntryView.swift; sourceTree = "<group>"; };
 		607E594125B0DFF20096B947 /* CreatePasscodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePasscodeView.swift; sourceTree = "<group>"; };
 		608C8AE425952CF800AE023B /* AppTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabView.swift; sourceTree = "<group>"; };
+		608CAE6D25B23C8B00726DC1 /* ScrollViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewExtension.swift; sourceTree = "<group>"; };
 		60AA5E9B25A372AC002D7786 /* TheSimplestDiary.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TheSimplestDiary.xcdatamodel; sourceTree = "<group>"; };
 		60AA5EE825A37CD4002D7786 /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = System/Library/Frameworks/HomeKit.framework; sourceTree = SDKROOT; };
 		60DD0DD825AF74E40030970F /* PassCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassCodeView.swift; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 		605C024E24D89B6000FBD7DD /* The Simplest Diary */ = {
 			isa = PBXGroup;
 			children = (
+				608CAE7225B23D1100726DC1 /* Extensions */,
 				60356CEC24DC651F00DC25C4 /* View */,
 				605C024F24D89B6000FBD7DD /* AppDelegate.swift */,
 				605C025124D89B6000FBD7DD /* SceneDelegate.swift */,
@@ -185,6 +188,14 @@
 				605C027324D89B6300FBD7DD /* Info.plist */,
 			);
 			path = "The Simplest DiaryUITests";
+			sourceTree = "<group>";
+		};
+		608CAE7225B23D1100726DC1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				608CAE6D25B23C8B00726DC1 /* ScrollViewExtension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		60AA5EE725A37CD4002D7786 /* Frameworks */ = {
@@ -338,6 +349,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */,
+				608CAE6E25B23C8B00726DC1 /* ScrollViewExtension.swift in Sources */,
 				608C8AE525952CF800AE023B /* AppTabView.swift in Sources */,
 				607E594225B0DFF20096B947 /* CreatePasscodeView.swift in Sources */,
 				60DD0DD925AF74E40030970F /* PassCodeView.swift in Sources */,

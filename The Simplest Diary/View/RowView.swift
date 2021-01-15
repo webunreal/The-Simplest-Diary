@@ -15,7 +15,7 @@ struct RowView: View {
     var text: String    
     private static let dateFormat: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .full
+        dateFormatter.dateStyle = .long
         dateFormatter.timeStyle = .short
         dateFormatter.locale = .current
         return dateFormatter

@@ -59,7 +59,8 @@ struct HomeView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                         }
-                        .padding()
+                        .padding(.leading, 3)
+                        .padding(.trailing, 3)
                         .navigationBarTitle("Entries")
                         .navigationBarItems(
                             trailing:
@@ -82,6 +83,7 @@ struct HomeView: View {
                                     })
                     }
                 }
+                .fixFlickering()
             }
         }
     }

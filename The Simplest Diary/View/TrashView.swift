@@ -86,7 +86,8 @@ struct TrashView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                         }
-                        .padding()
+                        .padding(.leading, 3)
+                        .padding(.trailing, 3)
                         .navigationBarTitle("Trash")
                         .navigationBarItems(
                             leading:
@@ -123,6 +124,7 @@ struct TrashView: View {
                             )
                     }
                 }
+                .fixFlickering()
             }
         }
     }
