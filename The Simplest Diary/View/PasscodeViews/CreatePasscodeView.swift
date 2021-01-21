@@ -16,7 +16,6 @@ struct CreatePasscodeView: View {
     @AppStorage("passcode") private var passcode: String = ""
     @Environment(\.presentationMode) var presentation
     @Binding var isPasscodeUsed: Bool
-    @Binding var isFaceIDToggleShown: Bool
     @State private var count: Int = 0
     @State private var firstEnteredPasscode: String = ""
     @State private var secondEnteredPasscode: String = ""
@@ -108,11 +107,13 @@ struct CreatePasscodeView: View {
                                     .frame(width: 80, height: 80)
                             }
                         }
+                        .padding(.bottom, hStackSpacing)
                     }
                 }
                 .onAppear(perform: disablePasscode)
                 .frame(width: geometry.size.width)
                 .frame(minHeight: geometry.size.height)
+                
             }
         }
     }
@@ -184,7 +185,6 @@ struct CreatePasscodeView: View {
         if self.firstEnteredPasscode == self.secondEnteredPasscode {
             self.passcode = self.secondEnteredPasscode
             self.isPasscodeUsed = true
-            self.isFaceIDToggleShown = true
             self.presentation.wrappedValue.dismiss()
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -214,6 +214,6 @@ struct CreatePasscodeView: View {
 @available(iOS 14.0, *)
 struct CreatePassCodeView_Previews: PreviewProvider {
     static var previews: some View {
-        CreatePasscodeView(isPasscodeUsed: .constant(false), isFaceIDToggleShown: .constant(false))
+        CreatePasscodeView(isPasscodeUsed: .constant(false))
     }
 }

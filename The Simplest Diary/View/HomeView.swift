@@ -13,6 +13,7 @@ import CoreHaptics
 struct HomeView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
+    @State private var searchText = ""
     
     private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
@@ -22,8 +23,18 @@ struct HomeView: View {
                 ScrollView(.vertical) {
                     if !entries.filter({!$0.isTrashed}).isEmpty {
                         LazyVStack {
-                            ForEach(entries.filter({!$0.isTrashed}).sorted(by: { $0.date! > $1.date! }), id: \.self) { entry in
-                                NavigationLink(destination:                           DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")) {
+                            SearchBarView(searchText: $searchText)
+                            ForEach(
+                                entries.filter {
+                                    guard let text = $0.text else { return false }
+                                    return self.searchText.isEmpty ?
+                                        !$0.isTrashed : !$0.isTrashed &&
+                                        text.lowercased().contains(self.searchText.lowercased())
+                                }.sorted(by: { guard let date1 = $0.date, let date2 = $1.date else { return false }
+                                    return date1 > date2
+                                }), id: \.self) { entry in
+                                NavigationLink(destination:
+                                                DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")) {
                                     ZStack {
                                         LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
                                             .cornerRadius(15)
@@ -47,10 +58,10 @@ struct HomeView: View {
                                             .offset(x: CGFloat(entry.offset))
                                             .gesture(DragGesture()
                                                         .onChanged({ value in
-                                                            onChanged(value: value, entry: entry)
+                                                            swipeOnChanged(value: value, entry: entry)
                                                         })
                                                         .onEnded({value in
-                                                            onEnded(value: value, entry: entry)
+                                                            swipeOnEnded(value: value, entry: entry)
                                                         })
                                             )
                                     }
@@ -59,8 +70,8 @@ struct HomeView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                         }
-                        .padding(.leading, 3)
-                        .padding(.trailing, 3)
+                        .resignKeyboardOnDragGesture()
+                        .padding(.horizontal)
                         .navigationBarTitle("Entries")
                         .navigationBarItems(
                             trailing:
@@ -84,6 +95,14 @@ struct HomeView: View {
                     }
                 }
                 .fixFlickering()
+                .onTapGesture {
+                    UIApplication.shared.endEditing(true)
+                }
+                .gesture(DragGesture()
+                            .onChanged({ _ in
+                            UIApplication.shared.endEditing(true)
+
+                }))
             }
         }
     }
@@ -106,7 +125,7 @@ struct HomeView: View {
         }
     }
     
-    private func onChanged(value: DragGesture.Value, entry: Entry) {
+    private func swipeOnChanged(value: DragGesture.Value, entry: Entry) {
         if value.translation.width < 0 {
             if entry.isSwiped {
                 entry.offset = Float(value.translation.width - 90)
@@ -116,7 +135,7 @@ struct HomeView: View {
         }
     }
     
-    private func onEnded(value: DragGesture.Value, entry: Entry) {
+    private func swipeOnEnded(value: DragGesture.Value, entry: Entry) {
         withAnimation(.easeOut) {
             if value.translation.width < 0 {
                 if -value.translation.width > UIScreen.main.bounds.width / 2 {

@@ -12,11 +12,11 @@ import LocalAuthentication
 @available(iOS 14.0, *)
 struct SettingsView: View {
     @State private var showCreatePasscodeView: Bool = false
-    @AppStorage("isFaceIDToggleShown") private var isFaceIDToggleShown: Bool = false
     @AppStorage("isPasscodeUsed") private var isPasscodeUsed: Bool = false
     @AppStorage("isFaceIDUsed") private var isFaceIDUsed: Bool = false
+    @AppStorage("passcode") private var passcode: String = ""
     
-    private let isFaceIDAvaliadle: () -> (Bool) = {
+    private let isFaceIDAvaliadle: Bool =  {
         let context = LAContext()
         var error: NSError?
         
@@ -25,12 +25,12 @@ struct SettingsView: View {
         } else {
             return false
         }
-    }
+    }()
     
     var body: some View {
         NavigationView {
             ZStack {
-                NavigationLink(destination: CreatePasscodeView(isPasscodeUsed: $isPasscodeUsed, isFaceIDToggleShown: $isFaceIDToggleShown), isActive: $showCreatePasscodeView) {}.hidden()
+                NavigationLink(destination: CreatePasscodeView(isPasscodeUsed: $isPasscodeUsed), isActive: $showCreatePasscodeView) {}.hidden()
                 Form {
                     Section(header: Text("Passcode")) {
                         Toggle(isOn: $isPasscodeUsed) {
@@ -40,11 +40,12 @@ struct SettingsView: View {
                             if value {
                                 self.showCreatePasscodeView = true
                             } else {
+                                self.passcode = ""
                                 self.isFaceIDUsed = false
                             }
                         })
                         
-                        if (isFaceIDAvaliadle() && self.isPasscodeUsed && isFaceIDToggleShown) {
+                        if isFaceIDAvaliadle && self.isPasscodeUsed && !self.passcode.isEmpty {
                             Toggle(isOn: $isFaceIDUsed) {
                                 Text("Use FaceID")
                             }

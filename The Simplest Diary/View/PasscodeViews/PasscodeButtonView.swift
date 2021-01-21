@@ -16,7 +16,7 @@ struct PasscodeButtonView: View {
             .font(.system(size: 40))
             .frame(width: 80, height: 80)
             .foregroundColor(.primary)
-            .background(Color.clear)
+            .background(Color("cardBackgroud"))
             .clipShape(Circle())
     }
 }

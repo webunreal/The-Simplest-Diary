@@ -21,7 +21,7 @@ struct PasscodeView: View {
     @AppStorage("isFaceIDUsed") private var isFaceIDUsed: Bool = false
     @Binding var isPasscodeCorrect: Bool
     
-    private let isFaceIDAvaliadle: () -> (Bool) = {
+    private let isFaceIDAvaliadle: Bool =  {
         let context = LAContext()
         var error: NSError?
         
@@ -30,7 +30,7 @@ struct PasscodeView: View {
         } else {
             return false
         }
-    }
+    }()
     
     var body: some View {
         GeometryReader { geometry in
@@ -74,7 +74,7 @@ struct PasscodeView: View {
                         }
                         HStack(spacing: hStackSpacing) {
                             Button(action: {
-                                if (self.isFaceIDAvaliadle() && self.isFaceIDUsed) {
+                                if (self.isFaceIDAvaliadle && self.isFaceIDUsed) {
                                     authenticate()
                                 }
                             }) {
@@ -82,7 +82,7 @@ struct PasscodeView: View {
                                     .font(.system(size: 40))
                                     .foregroundColor(.primary)
                                     .frame(width: 80, height: 80)
-                                    .opacity((self.isFaceIDAvaliadle() && self.isFaceIDUsed) ? 1 : 0)
+                                    .opacity((self.isFaceIDAvaliadle && self.isFaceIDUsed) ? 1 : 0)
                             }
                             Button(action: {
                                 buttonTapped(number: 0)
@@ -98,6 +98,7 @@ struct PasscodeView: View {
                                     .frame(width: 80, height: 80)
                             }
                         }
+                        .padding(.bottom, hStackSpacing)
                     }
                 }
                 .onAppear(perform: authenticate)
