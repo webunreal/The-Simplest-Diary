@@ -95,9 +95,6 @@ struct HomeView: View {
                     }
                 }
                 .fixFlickering()
-                .onTapGesture {
-                    UIApplication.shared.endEditing(true)
-                }
                 .gesture(DragGesture()
                             .onChanged({ _ in
                             UIApplication.shared.endEditing(true)

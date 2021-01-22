@@ -11,7 +11,7 @@ import AudioToolbox
 
 @available(iOS 14.0, *)
 struct CreatePasscodeView: View {
-    private let hStackSpacing: CGFloat = 30
+    private let hStackSpacing: CGFloat = 20
     
     @AppStorage("passcode") private var passcode: String = ""
     @Environment(\.presentationMode) var presentation
@@ -44,9 +44,10 @@ struct CreatePasscodeView: View {
                             }
                         }
                         .padding(.bottom, 20)
-                        if self.isFirstFieldFilled {
                             Text("Repeate passcode")
                                 .padding(.bottom, 20)
+                                .opacity(self.isFirstFieldFilled ? 1 : 0)
+                                .animation(.spring())
                             
                             HStack {
                                 ForEach(1..<5) { index in
@@ -54,11 +55,11 @@ struct CreatePasscodeView: View {
                                         .animation(.spring())
                                 }
                             }
+                            .opacity(self.isFirstFieldFilled ? 1 : 0)
                             .padding(.bottom, 50)
-                        }
                     }
                     Spacer()
-                    VStack(spacing: 10) {
+                    VStack(spacing: 5) {
                         HStack(spacing: hStackSpacing) {
                             ForEach(1..<4) { number in
                                 Button(action: {
