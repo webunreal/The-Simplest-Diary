@@ -13,10 +13,11 @@ import CoreHaptics
 struct TrashView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
-    
-    @State private var showAlertDeleteAllEntries = false
-    @State private var showAlertDeleteOneEntry = false
+    @State private var showDeletingAlert: Bool = false
+    @State private var showAlertDeleteSelectedEntries: Bool = false
+    @State private var showAlertDeleteOneEntry: Bool = false
     @State private var deletingEntry: Entry? = nil
+    @State private var showingSelection: Bool = false
     
     private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
@@ -31,64 +32,77 @@ struct TrashView: View {
                             }.sorted(by: { guard let date1 = $0.date, let date2 = $1.date else { return false }
                                 return date1 > date2
                             }), id: \.self) { entry in
-                                NavigationLink(destination:
-                                                TrashedEntryView(entry: entry)) {
-                                    ZStack {
-                                        LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
-                                            .cornerRadius(15)
-                                            .opacity(-Double(entry.offset) / 180)
-                                        HStack(spacing: 0) {
-                                            Spacer()
-                                            ZStack {
-                                                LinearGradient(gradient: .init(colors: [Color(.clear), Color(.blue)]), startPoint: .leading, endPoint: .trailing)
-                                                    .cornerRadius(15)
-                                                HStack(spacing: 0) {
-                                                    Spacer()
-                                                    Button(action: {
-                                                        withAnimation(.easeIn) {
-                                                            recoverOneEntryFromTrash(entry: entry)
+                                if self.showingSelection {
+                                    HStack {
+                                        Button(action: {
+                                            entry.isSelected.toggle()
+                                        }) {
+                                            SelectionView(isFilled: entry.isSelected)
+                                        }
+                                        .frame(width: 30, height: 80)
+                                        
+                                        RowView(date: entry.date ?? Date(), text: entry.text ?? "Error")
+                                    }
+                                } else {
+                                    NavigationLink(destination:
+                                                    TrashedEntryView(entry: entry)) {
+                                        ZStack {
+                                            LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
+                                                .cornerRadius(15)
+                                                .opacity(-Double(entry.offset) / 180)
+                                            HStack(spacing: 0) {
+                                                Spacer()
+                                                ZStack {
+                                                    LinearGradient(gradient: .init(colors: [Color(.clear), Color(.blue)]), startPoint: .leading, endPoint: .trailing)
+                                                        .cornerRadius(15)
+                                                    HStack(spacing: 0) {
+                                                        Spacer()
+                                                        Button(action: {
+                                                            withAnimation(.easeIn) {
+                                                                recoverOneEntryFromTrash(entry: entry)
+                                                            }
+                                                        }) {
+                                                            Image(systemName: "arrow.clockwise")
+                                                                .font(.title)
+                                                                .foregroundColor(.white)
+                                                                .frame(width: 90, height: 80)
                                                         }
-                                                    }) {
-                                                        Image(systemName: "arrow.clockwise")
-                                                            .font(.title)
-                                                            .foregroundColor(.white)
-                                                            .frame(width: 90, height: 80)
                                                     }
                                                 }
+                                                Button(action: {
+                                                    self.deletingEntry = entry
+                                                    self.showAlertDeleteOneEntry = true
+                                                }) {
+                                                    Image(systemName: "trash")
+                                                        .font(.title)
+                                                        .foregroundColor(.white)
+                                                        .frame(width: 90, height: 80)
+                                                }
+                                                .alert(isPresented: $showAlertDeleteOneEntry) {
+                                                    Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Yes"), action: {
+                                                        if let entry = deletingEntry {
+                                                            deleteOneEntryFromTrash(entry: entry)
+                                                        }
+                                                    }), secondaryButton: .cancel())
+                                                }
                                             }
-                                            Button(action: {
-                                                self.deletingEntry = entry
-                                                self.showAlertDeleteOneEntry = true
-                                            }) {
-                                                Image(systemName: "trash")
-                                                    .font(.title)
-                                                    .foregroundColor(.white)
-                                                    .frame(width: 90, height: 80)
-                                            }
-                                            .alert(isPresented: $showAlertDeleteOneEntry) {
-                                                Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Yes"), action: {
-                                                    if let entry = deletingEntry {
-                                                        deleteOneEntryFromTrash(entry: entry)
-                                                    }
-                                                }), secondaryButton: .cancel())
-                                            }
+                                            .opacity(-Double(entry.offset) / 180)
+                                            RowView(date: entry.date ?? Date(), text: entry.text ?? "Error")
+                                                .contentShape(Rectangle())
+                                                .offset(x: CGFloat(entry.offset))
+                                                .gesture(DragGesture()
+                                                            .onChanged({ value in
+                                                                swipeOnChanged(value: value, entry: entry)
+                                                            })
+                                                            .onEnded({value in
+                                                                swipeOnEnded(value: value, entry: entry)
+                                                            })
+                                                )
                                         }
-                                        .opacity(-Double(entry.offset) / 180)
-                                        RowView(date: entry.date ?? Date(), text: entry.text ?? "Error")
-                                            .contentShape(Rectangle())
-                                            .offset(x: CGFloat(entry.offset))
-                                            .gesture(DragGesture()
-                                                        .onChanged({ value in
-                                                            swipeOnChanged(value: value, entry: entry)
-                                                        })
-                                                        .onEnded({value in
-                                                            swipeOnEnded(value: value, entry: entry)
-                                                        })
-                                            )
                                     }
+                                    .padding(.bottom, 1)
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .padding(.bottom, 1)
-                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(.horizontal)
@@ -96,23 +110,52 @@ struct TrashView: View {
                         .navigationBarItems(
                             leading:
                                 Button(action: {
-                                    self.showAlertDeleteAllEntries = true
-                                }) {
-                                    Text("Delete all")
-                                        .foregroundColor(.red)
-                                }
-                                .alert(isPresented: $showAlertDeleteAllEntries) {
-                                    Alert(title: Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Yes"), action: {
-                                        deleteAllEntriesFromTrash()
-                                    }), secondaryButton: .cancel())
-                                },
-                            trailing:
-                                Button(action: {
-                                    withAnimation(.easeIn) {
-                                        recoverAllEntriesFromTrash()
+                                    self.showingSelection.toggle()
+                                    for entry in entries {
+                                        entry.isSelected = false
                                     }
                                 }) {
-                                    Text("Recover all")
+                                    Text("Select")
+                                        .font(.title3)
+                                },
+                            trailing:
+                                Menu {
+                                    Button(action: {
+                                        withAnimation(.easeIn) {
+                                            self.showingSelection ?
+                                                recoverSelectedEntries() :
+                                                recoverAllEntriesFromTrash()
+                                        }
+                                        self.showingSelection = false
+                                    }) {
+                                        Label(self.showingSelection ? "Recover" : "Recover all",
+                                              systemImage: "arrow.clockwise")
+                                    }
+                                    .disabled(self.showingSelection && !checkAtLeastOneIsSelected())
+                                    
+                                    Button(action: {
+                                        self.showDeletingAlert = true
+                                    }) {
+                                        Label(self.showingSelection ? "Delete" : "Delete all",
+                                              systemImage: "trash")
+                                    }
+                                    .foregroundColor(.red)
+                                    .disabled(self.showingSelection && !checkAtLeastOneIsSelected())
+                                } label: {
+                                    Image(systemName: "ellipsis.circle")
+                                        .resizable()
+                                        .frame(width: 25, height: 25)
+                                }
+                                .alert(isPresented: $showDeletingAlert) {
+                                    Alert(title:
+                                            self.showingSelection ?
+                                            Text("Delete selected entries from Trash?") :
+                                            Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Yes"), action: {
+                                                self.showingSelection ?
+                                                    deleteSelectedEntries() :
+                                                    deleteAllEntriesFromTrash()
+                                                self.showingSelection = false
+                                            }), secondaryButton: .cancel())
                                 }
                         )
                     } else {
@@ -137,6 +180,7 @@ struct TrashView: View {
         entry.isTrashed = false
         entry.offset = 0
         entry.isSwiped = false
+        entry.isSelected = false
         
         saveContext()
     }
@@ -159,6 +203,18 @@ struct TrashView: View {
         }
     }
     
+    private func deleteSelectedEntries() {
+        for entry in entries.filter({$0.isTrashed}) where entry.isSelected {
+            deleteOneEntryFromTrash(entry: entry)
+        }
+    }
+    
+    private func recoverSelectedEntries() {
+        for entry in entries.filter({$0.isTrashed}) where entry.isSelected {
+            recoverOneEntryFromTrash(entry: entry)
+        }
+    }
+    
     private func saveContext() {
         haptic.impactOccurred()
         
@@ -167,6 +223,15 @@ struct TrashView: View {
         } catch {
             print("Error saving managed object context: \(error)")
         }
+    }
+    
+    private func checkAtLeastOneIsSelected() -> Bool {
+        for entry in entries.filter({$0.isTrashed}) {
+            if entry.isSelected {
+                return true
+            }
+        }
+        return false
     }
     
     private func swipeOnChanged(value: DragGesture.Value, entry: Entry) {

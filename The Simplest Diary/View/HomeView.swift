@@ -14,7 +14,9 @@ struct HomeView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var entries: FetchedResults<Entry>
     @State private var searchText = ""
+    @State private var showingSelection: Bool = false
     
+    private let navigationBarImageSize: CGFloat = 25
     private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
     var body: some View {
@@ -23,7 +25,9 @@ struct HomeView: View {
                 ScrollView(.vertical) {
                     if !entries.filter({!$0.isTrashed}).isEmpty {
                         LazyVStack {
-                            SearchBarView(searchText: $searchText)
+                                SearchBarView(searchText: $searchText)
+                                    .opacity(self.showingSelection ? 0 : 1)
+                                    .animation(.easeInOut)
                             ForEach(
                                 entries.filter {
                                     guard let text = $0.text else { return false }
@@ -33,53 +37,95 @@ struct HomeView: View {
                                 }.sorted(by: { guard let date1 = $0.date, let date2 = $1.date else { return false }
                                     return date1 > date2
                                 }), id: \.self) { entry in
-                                NavigationLink(destination:
-                                                DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")) {
-                                    ZStack {
-                                        LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
-                                            .cornerRadius(15)
-                                            .opacity(-Double(entry.offset) / 90)
-                                        HStack {
-                                            Spacer()
-                                            Button(action: {
-                                                withAnimation(.easeIn) {
-                                                    moveToTrash(entry: entry)
-                                                }
-                                            }) {
-                                                Image(systemName: "trash")
-                                                    .font(.title)
-                                                    .foregroundColor(.white)
-                                                    .frame(width: 90, height: 50)
-                                            }
+                                if self.showingSelection {
+                                    HStack {
+                                        Button(action: {
+                                            entry.isSelected.toggle()
+                                        }) {
+                                            SelectionView(isFilled: entry.isSelected)
                                         }
-                                        .opacity(-Double(entry.offset) / 90)
+                                        .frame(width: 30, height: 80)
+                                        
                                         RowView(date: entry.date ?? Date(), text: entry.text ?? "Error")
-                                            .contentShape(Rectangle())
-                                            .offset(x: CGFloat(entry.offset))
-                                            .gesture(DragGesture()
-                                                        .onChanged({ value in
-                                                            swipeOnChanged(value: value, entry: entry)
-                                                        })
-                                                        .onEnded({value in
-                                                            swipeOnEnded(value: value, entry: entry)
-                                                        })
-                                            )
                                     }
+                                } else {
+                                    NavigationLink(destination:
+                                                    DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")) {
+                                        ZStack {
+                                            LinearGradient(gradient: .init(colors: [Color("cardBackgroud"), Color(.red)]), startPoint: .leading, endPoint: .trailing)
+                                                .cornerRadius(15)
+                                                .opacity(-Double(entry.offset) / 90)
+                                            HStack {
+                                                Spacer()
+                                                Button(action: {
+                                                    withAnimation(.easeIn) {
+                                                        moveToTrash(entry: entry)
+                                                    }
+                                                }) {
+                                                    Image(systemName: "trash")
+                                                        .font(.title)
+                                                        .foregroundColor(.white)
+                                                        .frame(width: 90, height: 50)
+                                                }
+                                            }
+                                            .opacity(-Double(entry.offset) / 90)
+                                            RowView(date: entry.date ?? Date(), text: entry.text ?? "Error")
+                                                .contentShape(Rectangle())
+                                                .offset(x: CGFloat(entry.offset))
+                                                .gesture(DragGesture()
+                                                            .onChanged({ value in
+                                                                swipeOnChanged(value: value, entry: entry)
+                                                            })
+                                                            .onEnded({value in
+                                                                swipeOnEnded(value: value, entry: entry)
+                                                            })
+                                                )
+                                        }
+                                    }
+                                    .padding(.bottom, 1)
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .padding(.bottom, 1)
-                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .resignKeyboardOnDragGesture()
                         .padding(.horizontal)
                         .navigationBarTitle("Entries")
                         .navigationBarItems(
+                            leading:
+                                Button(action: {
+                                    self.showingSelection.toggle()
+                                    for entry in entries {
+                                        entry.isSelected = false
+                                    }
+                                }) {
+                                    Text("Select")
+                                        .font(.title3)
+                                },
                             trailing:
-                                NavigationLink(destination: AddNewEntryView()) {
-                                    Image(systemName: "square.and.pencil")
-                                        .resizable()
-                                        .frame(width: 25, height: 25)
-                                })
+                                Button(action: {
+                                    if self.showingSelection {
+                                        withAnimation(.easeIn) {
+                                            moveSelectedToTrash()
+                                        }
+                                        self.showingSelection = false
+                                    }
+                                }) {
+                                    if self.showingSelection {
+                                        Image(systemName: "trash")
+                                            .resizable()
+                                            .frame(width: navigationBarImageSize, height: navigationBarImageSize)
+                                            .foregroundColor(checkAtLeastOneIsSelected() ? .red : .secondary)
+                                    } else if self.searchText.isEmpty {
+                                        NavigationLink(destination: AddNewEntryView()) {
+                                            Image(systemName: "square.and.pencil")
+                                                .resizable()
+                                                .frame(width: navigationBarImageSize, height: navigationBarImageSize)
+                                        }
+                                    }
+                                }
+                                .animation(.easeInOut(duration: 0.2))
+                                .disabled(self.showingSelection && !checkAtLeastOneIsSelected())
+                        )
                     } else {
                         NoEntriesView()
                             .frame(width: geometry.size.width)
@@ -90,16 +136,16 @@ struct HomeView: View {
                                     NavigationLink(destination: AddNewEntryView()) {
                                         Image(systemName: "square.and.pencil")
                                             .resizable()
-                                            .frame(width: 25, height: 25)
+                                            .frame(width: navigationBarImageSize, height: navigationBarImageSize)
                                     })
                     }
                 }
                 .fixFlickering()
                 .gesture(DragGesture()
                             .onChanged({ _ in
-                            UIApplication.shared.endEditing(true)
-
-                }))
+                                UIApplication.shared.endEditing(true)
+                                
+                            }))
             }
         }
     }
@@ -108,8 +154,15 @@ struct HomeView: View {
         entry.isTrashed = true
         entry.offset = 0
         entry.isSwiped = false
+        entry.isSelected = false
         
         saveContext()
+    }
+    
+    private func moveSelectedToTrash() {
+        for entry in entries.filter({!$0.isTrashed}) where entry.isSelected {
+            moveToTrash(entry: entry)
+        }
     }
     
     private func saveContext() {
@@ -120,6 +173,15 @@ struct HomeView: View {
         } catch {
             print("Error saving managed object context: \(error)")
         }
+    }
+    
+    private func checkAtLeastOneIsSelected() -> Bool {
+        for entry in entries.filter({!$0.isTrashed}) {
+            if entry.isSelected {
+                return true
+            }
+        }
+        return false
     }
     
     private func swipeOnChanged(value: DragGesture.Value, entry: Entry) {

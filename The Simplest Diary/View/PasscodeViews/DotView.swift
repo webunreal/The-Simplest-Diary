@@ -18,7 +18,7 @@ struct DotView: View {
             .overlay(
                 Circle()
                     .stroke(Color("cardBackgroud"), lineWidth: 1)
-            ).foregroundColor(Color.red)
+            )
     }
 }
 

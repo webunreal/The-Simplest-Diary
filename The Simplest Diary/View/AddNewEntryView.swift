@@ -48,6 +48,7 @@ struct AddNewEntryView: View {
             newEntry.offset = 0
             newEntry.isSwiped = false
             newEntry.isTrashed = false
+            newEntry.isSelected = false
             
             saveContext()
             

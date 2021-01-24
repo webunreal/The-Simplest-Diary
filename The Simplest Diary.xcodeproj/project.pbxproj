@@ -33,6 +33,7 @@
 		60DD0DD925AF74E40030970F /* PassCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DD825AF74E40030970F /* PassCodeView.swift */; };
 		60DD0DDE25AF77040030970F /* PasscodeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DDD25AF77040030970F /* PasscodeButtonView.swift */; };
 		60DD0DE325AF83880030970F /* DotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DE225AF83880030970F /* DotView.swift */; };
+		60F6706C25BD76C400FA2F2C /* SelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F6706B25BD76C400FA2F2C /* SelectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 		60DD0DD825AF74E40030970F /* PassCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassCodeView.swift; sourceTree = "<group>"; };
 		60DD0DDD25AF77040030970F /* PasscodeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasscodeButtonView.swift; sourceTree = "<group>"; };
 		60DD0DE225AF83880030970F /* DotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotView.swift; sourceTree = "<group>"; };
+		60F6706B25BD76C400FA2F2C /* SelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +128,7 @@
 				60356CF324DC743000DC25C4 /* AddNewEntryView.swift */,
 				600A261D259A603400044FB2 /* NoEntriesView.swift */,
 				6070429625B9EFB700701597 /* SearchBarView.swift */,
+				60F6706B25BD76C400FA2F2C /* SelectionView.swift */,
 				60DD0DEA25B0CF0D0030970F /* PasscodeViews */,
 			);
 			path = View;
@@ -361,6 +364,7 @@
 				60DD0DD925AF74E40030970F /* PassCodeView.swift in Sources */,
 				605C025024D89B6000FBD7DD /* AppDelegate.swift in Sources */,
 				60356CEE24DC658B00DC25C4 /* HomeView.swift in Sources */,
+				60F6706C25BD76C400FA2F2C /* SelectionView.swift in Sources */,
 				60356CF024DC6B0E00DC25C4 /* DetailedEntryView.swift in Sources */,
 				60598B6624E1D8DD00A36C62 /* RowView.swift in Sources */,
 				6073A378259734CC00D369A3 /* TrashedEntryView.swift in Sources */,
