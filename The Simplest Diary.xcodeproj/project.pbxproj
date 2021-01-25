@@ -34,6 +34,7 @@
 		60DD0DDE25AF77040030970F /* PasscodeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DDD25AF77040030970F /* PasscodeButtonView.swift */; };
 		60DD0DE325AF83880030970F /* DotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD0DE225AF83880030970F /* DotView.swift */; };
 		60F6706C25BD76C400FA2F2C /* SelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F6706B25BD76C400FA2F2C /* SelectionView.swift */; };
+		60F6707A25BF3F6700FA2F2C /* Biometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F6707925BF3F6700FA2F2C /* Biometric.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 		60DD0DDD25AF77040030970F /* PasscodeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasscodeButtonView.swift; sourceTree = "<group>"; };
 		60DD0DE225AF83880030970F /* DotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotView.swift; sourceTree = "<group>"; };
 		60F6706B25BD76C400FA2F2C /* SelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionView.swift; sourceTree = "<group>"; };
+		60F6707925BF3F6700FA2F2C /* Biometric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometric.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +162,7 @@
 			children = (
 				60356CEC24DC651F00DC25C4 /* View */,
 				608CAE7225B23D1100726DC1 /* Extensions */,
+				60F6707925BF3F6700FA2F2C /* Biometric.swift */,
 				605C024F24D89B6000FBD7DD /* AppDelegate.swift */,
 				605C025124D89B6000FBD7DD /* SceneDelegate.swift */,
 				60AA5E9A25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld */,
@@ -375,6 +378,7 @@
 				60C11E9825BA0B460093DBCA /* ViewExtension.swift in Sources */,
 				605C025224D89B6000FBD7DD /* SceneDelegate.swift in Sources */,
 				60C11E9325BA0B1B0093DBCA /* UIApplicationExtension.swift in Sources */,
+				60F6707A25BF3F6700FA2F2C /* Biometric.swift in Sources */,
 				60DD0DDE25AF77040030970F /* PasscodeButtonView.swift in Sources */,
 				60356CF424DC743000DC25C4 /* AddNewEntryView.swift in Sources */,
 				600A261E259A603400044FB2 /* NoEntriesView.swift in Sources */,
@@ -474,7 +478,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -528,7 +532,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

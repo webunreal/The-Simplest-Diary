@@ -18,19 +18,8 @@ struct PasscodeView: View {
     @State private var isDotFilled = [Bool](repeating: false, count: 4)
     @State private var enteredPasscode: String = ""
     @AppStorage("passcode") private var passcode: String = ""
-    @AppStorage("isFaceIDUsed") private var isFaceIDUsed: Bool = false
+    @AppStorage("isBiometricUsed") private var isBiometricUsed: Bool = false
     @Binding var isPasscodeCorrect: Bool
-    
-    private let isFaceIDAvaliadle: Bool =  {
-        let context = LAContext()
-        var error: NSError?
-        
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            return true
-        } else {
-            return false
-        }
-    }()
     
     var body: some View {
         GeometryReader { geometry in
@@ -74,15 +63,15 @@ struct PasscodeView: View {
                         }
                         HStack(spacing: hStackSpacing) {
                             Button(action: {
-                                if (self.isFaceIDAvaliadle && self.isFaceIDUsed) {
+                                if (Biometric.biometricType != .none && self.isBiometricUsed) {
                                     authenticate()
                                 }
                             }) {
-                                Image(systemName: "faceid")
+                                Image(systemName: Biometric.biometricImageName)
                                     .font(.system(size: 40))
                                     .foregroundColor(.primary)
                                     .frame(width: 80, height: 80)
-                                    .opacity((self.isFaceIDAvaliadle && self.isFaceIDUsed) ? 1 : 0)
+                                    .opacity((Biometric.biometricType != .none && self.isBiometricUsed) ? 1 : 0)
                             }
                             Button(action: {
                                 buttonTapped(number: 0)
@@ -143,7 +132,7 @@ struct PasscodeView: View {
     }
     
     private func authenticate() {
-        if !self.isFaceIDUsed {
+        if !self.isBiometricUsed {
             return
         } else {
             let context = LAContext()

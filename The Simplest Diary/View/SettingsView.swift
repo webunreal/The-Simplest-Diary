@@ -13,19 +13,8 @@ import LocalAuthentication
 struct SettingsView: View {
     @State private var showCreatePasscodeView: Bool = false
     @AppStorage("isPasscodeUsed") private var isPasscodeUsed: Bool = false
-    @AppStorage("isFaceIDUsed") private var isFaceIDUsed: Bool = false
+    @AppStorage("isBiometricUsed") private var isBiometricUsed: Bool = false
     @AppStorage("passcode") private var passcode: String = ""
-    
-    private let isFaceIDAvaliadle: Bool =  {
-        let context = LAContext()
-        var error: NSError?
-        
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            return true
-        } else {
-            return false
-        }
-    }()
     
     var body: some View {
         NavigationView {
@@ -41,13 +30,13 @@ struct SettingsView: View {
                                 self.showCreatePasscodeView = true
                             } else {
                                 self.passcode = ""
-                                self.isFaceIDUsed = false
+                                self.isBiometricUsed = false
                             }
                         })
                         
-                        if isFaceIDAvaliadle && self.isPasscodeUsed && !self.passcode.isEmpty {
-                            Toggle(isOn: $isFaceIDUsed) {
-                                Text("Use FaceID")
+                        if Biometric.biometricType != .none && self.isPasscodeUsed && !self.passcode.isEmpty {
+                            Toggle(isOn: $isBiometricUsed) {
+                                Text("Use " + Biometric.biometricTypeName)
                             }
                         }
                     }

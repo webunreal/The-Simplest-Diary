@@ -25,9 +25,9 @@ struct HomeView: View {
                 ScrollView(.vertical) {
                     if !entries.filter({!$0.isTrashed}).isEmpty {
                         LazyVStack {
-                                SearchBarView(searchText: $searchText)
-                                    .opacity(self.showingSelection ? 0 : 1)
-                                    .animation(.easeInOut)
+                            SearchBarView(searchText: $searchText)
+                                .opacity(self.showingSelection ? 0 : 1)
+                                .animation(.easeInOut)
                             ForEach(
                                 entries.filter {
                                     guard let text = $0.text else { return false }
