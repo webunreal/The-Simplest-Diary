@@ -28,7 +28,6 @@ struct CreatePasscodeView: View {
         GeometryReader { geometry in
             ScrollView(.vertical, showsIndicators: false) {
                 VStack {
-                    Spacer()
                     VStack {
                         if self.isErrorTextShown {
                             Text("Passcodes are not the same")
@@ -56,7 +55,7 @@ struct CreatePasscodeView: View {
                                 }
                             }
                             .opacity(self.isFirstFieldFilled ? 1 : 0)
-                            .padding(.bottom, 50)
+                            .padding(.bottom, 5)
                     }
                     Spacer()
                     VStack(spacing: 5) {

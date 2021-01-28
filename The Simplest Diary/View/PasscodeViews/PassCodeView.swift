@@ -26,6 +26,8 @@ struct PasscodeView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack {
                     Spacer()
+                    Text("Enter passcode")
+                        .padding(.bottom, 20)
                     HStack {
                         ForEach(1..<5) { index in
                             DotView(isFilled: isDotFilled[index - 1])
