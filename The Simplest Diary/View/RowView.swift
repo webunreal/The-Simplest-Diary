@@ -11,6 +11,8 @@ import SwiftUI
 @available(iOS 14.0, *)
 
 struct RowView: View {
+    @Environment(\.colorScheme) var colorScheme
+    
     var date: Date
     var text: String    
     private static let dateFormat: DateFormatter = {
@@ -22,17 +24,25 @@ struct RowView: View {
     }()
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             Text(date, formatter: RowView.dateFormat)
-                .font(.system(size: 15))
-                .padding(.bottom, 5)
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, minHeight: 15, alignment: .leading)
+                .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                .background(Color(colorScheme == .dark ?
+                                    .secondarySystemBackground :
+                                    .systemFill
+                ))
+                .cornerRadius(15, corners: [.topLeft, .topRight])
+            
             Text(text)
-                .multilineTextAlignment(.leading)
                 .font(.system(size: 20))
+                .multilineTextAlignment(.leading)
                 .lineLimit(5)
+                .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
+                .padding(EdgeInsets(top: 0, leading: 15, bottom: 10, trailing: 15))
         }
-        .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
-        .padding()
         .background(Color("cardBackgroud"))
         .cornerRadius(15)
     }
@@ -42,7 +52,7 @@ struct RowView: View {
 struct RowView_Previews: PreviewProvider {
     static var previews: some View {
         RowView(date: Date(), text: "text")
-            .environment(\.colorScheme, .dark)
+//            .environment(\.colorScheme, .dark)
     }
 }
 

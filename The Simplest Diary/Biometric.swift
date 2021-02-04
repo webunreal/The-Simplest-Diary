@@ -9,7 +9,7 @@
 import Foundation
 import LocalAuthentication
 
-public final class Biometric {
+public struct Biometric {
     
     public enum BiometricType {
         case none

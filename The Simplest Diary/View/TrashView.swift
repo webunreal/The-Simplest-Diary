@@ -21,12 +21,31 @@ struct TrashView: View {
     
     private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
+    private var columns: [GridItem]  {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ]
+        } else {
+            return [GridItem(.flexible())]
+        }
+    }
+    
+    private var swipeWidthForDelete: CGFloat {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return UIScreen.main.bounds.width / 4
+        } else {
+            return UIScreen.main.bounds.width / 2
+        }
+    }
+    
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
                 ScrollView(.vertical) {
                     if !entries.filter({$0.isTrashed}).isEmpty {
-                        LazyVStack {
+                        LazyVGrid(columns: columns) {
                             ForEach(entries.filter {
                                 $0.isTrashed
                             }.sorted(by: { guard let date1 = $0.date, let date2 = $1.date else { return false }
@@ -115,7 +134,9 @@ struct TrashView: View {
                                         entry.isSelected = false
                                     }
                                 }) {
-                                    Text("Select")
+                                    Text(self.showingSelection ?
+                                            "Done" :
+                                            "Select")
                                         .font(.title3)
                                 },
                             trailing:
@@ -145,6 +166,7 @@ struct TrashView: View {
                                     Image(systemName: "ellipsis.circle")
                                         .resizable()
                                         .frame(width: 25, height: 25)
+                                        .disabled(self.showingSelection && !checkAtLeastOneIsSelected())
                                 }
                                 .alert(isPresented: $showDeletingAlert) {
                                     Alert(title:
@@ -174,6 +196,7 @@ struct TrashView: View {
                 .fixFlickering()
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     private func recoverOneEntryFromTrash(entry: Entry) {
@@ -247,7 +270,7 @@ struct TrashView: View {
     private func swipeOnEnded(value: DragGesture.Value, entry: Entry) {
         withAnimation(.easeOut) {
             if value.translation.width < 0 {
-                if -value.translation.width > UIScreen.main.bounds.width / 2 {
+                if -value.translation.width > swipeWidthForDelete {
                     entry.offset = -1000
                     self.deletingEntry = entry
                     self.showAlertDeleteOneEntry = true

@@ -50,6 +50,7 @@ struct SearchBarView: View {
                 .foregroundColor(Color(.systemBlue))
             }
         }
+        .padding()
     }
 }
 
