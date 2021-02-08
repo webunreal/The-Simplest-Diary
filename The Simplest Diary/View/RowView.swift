@@ -14,7 +14,8 @@ struct RowView: View {
     @Environment(\.colorScheme) var colorScheme
     
     var date: Date
-    var text: String    
+    var text: String
+    
     private static let dateFormat: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .long
@@ -22,6 +23,14 @@ struct RowView: View {
         dateFormatter.locale = .current
         return dateFormatter
     }()
+    
+    private var entryHeight: CGFloat {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return 120
+        } else {
+            return 80
+        }
+    }
     
     var body: some View {
         VStack {
@@ -40,7 +49,7 @@ struct RowView: View {
                 .font(.system(size: 20))
                 .multilineTextAlignment(.leading)
                 .lineLimit(5)
-                .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
+                .frame(maxWidth: .infinity, minHeight: entryHeight, alignment: .topLeading)
                 .padding(EdgeInsets(top: 0, leading: 15, bottom: 10, trailing: 15))
         }
         .background(Color("cardBackgroud"))
