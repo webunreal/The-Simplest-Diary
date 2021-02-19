@@ -1,4 +1,4 @@
-# The Simplest Diary
+# The Simplest Diary in SwiftUI
 The simplest app for saving some entries.
 
 [![F759-C819-5364-475-F-A8-F6-D11-AEEFB53-A6.jpg](https://i.postimg.cc/QxmBWw4k/F759-C819-5364-475-F-A8-F6-D11-AEEFB53-A6.jpg)](https://postimg.cc/BX8ZrYGX)
