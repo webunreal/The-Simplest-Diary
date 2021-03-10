@@ -56,8 +56,6 @@ struct TrashedEntryView: View {
     
     private func recoverEntry() {
         entry.isTrashed = false
-        entry.offset = 0
-        entry.isSwiped = false
         
         saveContext()
     }

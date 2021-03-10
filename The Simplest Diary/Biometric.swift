@@ -56,5 +56,4 @@ public struct Biometric {
             return ""
         }
     }()
-    
 }

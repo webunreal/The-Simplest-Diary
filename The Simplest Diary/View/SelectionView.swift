@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SelectionView: View {
     var isFilled: Bool
-    private let dotFrame: CGFloat = 20
+    private let dotFrame: CGFloat = 25
     
     var body: some View {
         if self.isFilled {

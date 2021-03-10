@@ -9,8 +9,8 @@
 import SwiftUI
 
 extension View {
-    func resignKeyboardOnDragGesture() -> some View {
-        return modifier(ResignKeyboardOnDragGesture())
+    func endEditing() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {

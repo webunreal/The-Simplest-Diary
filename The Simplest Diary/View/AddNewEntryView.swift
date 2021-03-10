@@ -45,8 +45,6 @@ struct AddNewEntryView: View {
             newEntry.id = UUID()
             newEntry.text = entryText
             newEntry.date = Date()
-            newEntry.offset = 0
-            newEntry.isSwiped = false
             newEntry.isTrashed = false
             newEntry.isSelected = false
             

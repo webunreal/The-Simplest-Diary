@@ -17,12 +17,8 @@ struct SearchBarView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .padding(.leading, 10)
-                TextField("Search", text: $searchText, onEditingChanged: { isEditing in
-                    withAnimation(.easeInOut) {
+                TextField("Search", text: $searchText, onEditingChanged: { _ in
                         self.showCancelButton = true
-                    }
-                }, onCommit: {
-                    UIApplication.shared.endEditing(true)
                 }).foregroundColor(.primary)
                 
                 Button(action: {
@@ -36,21 +32,19 @@ struct SearchBarView: View {
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
             .foregroundColor(.secondary)
             .background(Color(.secondarySystemBackground))
-            .cornerRadius(10.0)
+            .cornerRadius(10)
             
             if showCancelButton  {
                 Button("Cancel") {
-                    withAnimation(.easeInOut) {
-                        UIApplication.shared.endEditing(true)
-                        self.searchText = ""
-                        self.showCancelButton = false
-                        
-                    }
+                    endEditing()
+                    self.searchText = ""
+                    self.showCancelButton = false
                 }
                 .foregroundColor(Color(.systemBlue))
             }
         }
         .padding()
+        .animation(.easeInOut)
     }
 }
 
