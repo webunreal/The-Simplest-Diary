@@ -31,6 +31,9 @@ struct PageView: View {
         case .home:
             return fetchedEntries.filter { !$0.isTrashed }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
                 return date1 > date2 }
+        case .pinned :
+            return fetchedEntries.filter { !$0.isTrashed && $0.isPinned }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
+                return date1 > date2 }
         case.trash:
             return fetchedEntries.filter { $0.isTrashed }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
                 return  date1 > date2 }
@@ -41,6 +44,8 @@ struct PageView: View {
         switch page {
         case .home:
             return "Entries"
+        case .pinned:
+            return "Pinned"
         case.trash:
             return "Trash"
         }
@@ -87,6 +92,14 @@ struct PageView: View {
                                     }
                                     .padding(.bottom, 1)
                                     .buttonStyle(PlainButtonStyle())
+                                case .pinned:
+                                    NavigationLink(
+                                        destination: DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")
+                                    ) {
+                                        RowView(entry: entry, showingSelection: $showingSelection, showAlertDeleteOneEntry: $showAlertDeleteOneEntry, deleteOneEntryAlert: $deleteOneEntryAlert, page: page)
+                                    }
+                                    .padding(.bottom, 1)
+                                    .buttonStyle(PlainButtonStyle())
                                 case .trash:
                                     NavigationLink(
                                         destination:
@@ -104,14 +117,16 @@ struct PageView: View {
                         //MARK: - Navigation Bar Items
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button {
-                                    showingSelection.toggle()
-                                    entries.forEach { $0.isSelected = false }
-                                } label: {
-                                    Text(showingSelection ?
-                                            "Done" :
-                                            "Select")
-                                        .font(.title3)
+                                if page != .pinned {
+                                    Button {
+                                        showingSelection.toggle()
+                                        entries.forEach { $0.isSelected = false }
+                                    } label: {
+                                        Text(showingSelection ?
+                                                "Done" :
+                                                "Select")
+                                            .font(.title3)
+                                    }
                                 }
                             }
                             ToolbarItem(placement: .navigationBarTrailing) {
@@ -133,6 +148,8 @@ struct PageView: View {
                                         }
                                         .disabled(!searchText.isEmpty)
                                     }
+                                case .pinned:
+                                    EmptyView()
                                 case .trash:
                                     Menu {
                                         Button {
@@ -196,6 +213,8 @@ struct PageView: View {
                                         NavigationLink(destination: AddNewEntryView()) {
                                             Image(systemName: "square.and.pencil")
                                         }
+                                    case .pinned:
+                                        EmptyView()
                                     case .trash:
                                         EmptyView()
                                     }
@@ -213,6 +232,7 @@ struct PageView: View {
     public func moveSelectedToTrash() {
         for entry in entries where entry.isSelected {
             entry.isTrashed = true
+            entry.isPinned = false
         }
         saveContext()
     }

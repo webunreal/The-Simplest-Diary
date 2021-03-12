@@ -13,7 +13,6 @@ struct HomeView: View {
     var body: some View {
         PageView(page: .home)
     }
-    
 }
 
 @available(iOS 14.0, *)

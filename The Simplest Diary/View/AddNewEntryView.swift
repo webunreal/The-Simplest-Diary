@@ -57,6 +57,7 @@ struct AddNewEntryView: View {
         newEntry.date = Date()
         newEntry.isTrashed = false
         newEntry.isSelected = false
+        newEntry.isPinned = false
         
         do {
             try managedObjectContext.save()

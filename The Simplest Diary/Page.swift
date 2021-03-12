@@ -10,5 +10,6 @@ import Foundation
 
 public enum Page {
     case home
+    case pinned
     case trash
 }

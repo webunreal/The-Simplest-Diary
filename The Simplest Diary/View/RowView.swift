@@ -19,7 +19,8 @@ struct RowView: View {
     @Binding var showingSelection: Bool
     @Binding var showAlertDeleteOneEntry: Bool
     @Binding var deleteOneEntryAlert: Alert?
-    @State private var currentSwipeFrameWidth: CGFloat = 0
+    @State private var currentRightSwipeFrameWidth: CGFloat = 0
+    @State private var currentLeftSwipeFrameWidth: CGFloat = 0
     
     public let page: Page
     
@@ -68,29 +69,49 @@ struct RowView: View {
             }
             .frame(width: showingSelection ? selectionWidth : 0)
             
+            Button {
+                entry.isPinned.toggle()
+                currentLeftSwipeFrameWidth = 0
+            } label: {
+                Image(systemName: entry.isPinned ? "pin.slash.fill" : "pin.fill")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .opacity(currentLeftSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
+            }
+            .frame(width: currentLeftSwipeFrameWidth)
+            .background(Color.orange)
+            
             VStack {
-                Text(entry.date ?? Date(), formatter: RowView.dateFormat)
-                    .font(.footnote)
-                    .lineLimit(1)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 15, alignment: .leading)
-                    .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
-                    .background(
-                        Color(colorScheme == .dark ?
-                                .secondarySystemBackground :
-                                .systemFill)
-                    )
-                    .cornerRadius(15, corners: [.topLeft])
+                HStack(spacing: 0) {
+                    Text(entry.date ?? Date(), formatter: RowView.dateFormat)
+                        .font(.footnote)
+                        .lineLimit(1)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, minHeight: 15, alignment: .leading)
+                        .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                    
+                        Image(systemName: "pin.fill")
+                            .foregroundColor(.orange)
+                            .opacity(entry.isPinned ? 1: 0)
+                            .padding(.trailing, 15)
+                }
+                .background(
+                    Color(colorScheme == .dark ?
+                            .secondarySystemBackground :
+                            .systemFill)
+                )
+                .cornerRadius(showingSelection ? 15 : 0, corners: [.topLeft])
                 
                 Text(entry.text ?? "Error")
                     .font(.system(size: 20))
                     .multilineTextAlignment(.leading)
                     .lineLimit(5)
                     .frame(maxWidth: .infinity, minHeight: entryHeight, alignment: .topLeading)
-                    .padding(EdgeInsets(top: 0, leading: 15, bottom: 10, trailing: 15))
+                    .padding(EdgeInsets(top: 1, leading: 15, bottom: 10, trailing: 15))
             }
             .background(Color("cardBackgroud"))
-            .cornerRadius(15, corners: [.topLeft, .bottomLeft])
+            .cornerRadius(showingSelection ? 15 : 0, corners: [.topLeft, .bottomLeft])
             
             if page == .trash {
                 Button {
@@ -100,9 +121,9 @@ struct RowView: View {
                         .font(.title)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .opacity(currentSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
+                        .opacity(currentRightSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
                 }
-                .frame(width: currentSwipeFrameWidth)
+                .frame(width: currentRightSwipeFrameWidth)
                 .background(Color.blue)
             }
             
@@ -110,11 +131,13 @@ struct RowView: View {
                 switch page {
                 case .home:
                     moveToTrash()
+                case .pinned:
+                    moveToTrash()
                 case.trash:
                     deleteOneEntryAlert =  Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Delete"), action: {
                         deleteEntryFromTrash()
                     }), secondaryButton: .cancel() {
-                        currentSwipeFrameWidth = 0
+                        currentRightSwipeFrameWidth = 0
                         
                     })
                     showAlertDeleteOneEntry = true
@@ -124,15 +147,15 @@ struct RowView: View {
                     .font(.title)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .opacity(currentSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
+                    .opacity(currentRightSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
             }
-            .frame(width: currentSwipeFrameWidth)
+            .frame(width: currentRightSwipeFrameWidth)
             .background(Color.red)
         }
         .cornerRadius(15)
         .animation(.spring())
         .onChange(of: showingSelection) { _ in
-            currentSwipeFrameWidth = 0
+            currentRightSwipeFrameWidth = 0
         }
         .gesture(DragGesture(minimumDistance: 30)
                     .onChanged { value in
@@ -146,6 +169,7 @@ struct RowView: View {
     
     private func moveToTrash() {
         entry.isTrashed = true
+        entry.isPinned = false
         saveContext()
     }
     
@@ -171,14 +195,18 @@ struct RowView: View {
     
     private func swipeOnChanged(value: DragGesture.Value) {
         if !showingSelection {
-            if value.translation.width < 0 {
+            if value.translation.width < 0 && currentLeftSwipeFrameWidth == 0 {
                 if value.translation.width < -swipeOptionsWidth {
-                    currentSwipeFrameWidth = swipeOptionsWidth
+                    currentRightSwipeFrameWidth = swipeOptionsWidth
                 } else {
-                    currentSwipeFrameWidth = -value.translation.width
+                    currentRightSwipeFrameWidth = -value.translation.width
                 }
-            } else if value.translation.width > 0 && currentSwipeFrameWidth == swipeOptionsWidth {
-                currentSwipeFrameWidth = 0
+            } else if value.translation.width > 0 && currentRightSwipeFrameWidth == 0 {
+                if value.translation.width > swipeOptionsWidth {
+                    currentLeftSwipeFrameWidth = swipeOptionsWidth
+                } else {
+                    currentLeftSwipeFrameWidth = value.translation.width
+                }
             }
         }
     }
@@ -186,13 +214,17 @@ struct RowView: View {
     private func swipeOnEnded(value: DragGesture.Value) {
         if !showingSelection {
             if value.translation.width < 0 {
-                if value.translation.width < -swipeOptionsWidth {
-                    currentSwipeFrameWidth = swipeOptionsWidth
+                if currentLeftSwipeFrameWidth == 0 {
+                    currentRightSwipeFrameWidth = swipeOptionsWidth
                 } else {
-                    currentSwipeFrameWidth = 0
+                    currentLeftSwipeFrameWidth = 0
                 }
-            } else {
-                currentSwipeFrameWidth = 0
+            } else if value.translation.width > 0 {
+                if currentRightSwipeFrameWidth == 0 {
+                    currentLeftSwipeFrameWidth = swipeOptionsWidth
+                } else {
+                    currentRightSwipeFrameWidth = 0
+                }
             }
         }
     }

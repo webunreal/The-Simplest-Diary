@@ -21,6 +21,12 @@ struct AppTabView: View {
                         Text("Entries")
                     }
                 
+                PinnedView()
+                    .tabItem {
+                        Image(systemName: "pin.fill")
+                        Text("Pinned")
+                    }
+                
                 TrashView()
                     .tabItem {
                         Image(systemName: "trash")

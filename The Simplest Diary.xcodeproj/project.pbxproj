@@ -19,6 +19,7 @@
 		605C025C24D89B6300FBD7DD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 605C025A24D89B6300FBD7DD /* LaunchScreen.storyboard */; };
 		6063583024E321B500B7D78D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6063582F24E321B500B7D78D /* SettingsView.swift */; };
 		6070429725B9EFB700701597 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6070429625B9EFB700701597 /* SearchBarView.swift */; };
+		6072151325FC1F020067903E /* PinnedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6072151225FC1F020067903E /* PinnedView.swift */; };
 		6073A3702597212400D369A3 /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6073A36F2597212400D369A3 /* TrashView.swift */; };
 		6073A378259734CC00D369A3 /* TrashedEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6073A377259734CC00D369A3 /* TrashedEntryView.swift */; };
 		607E594225B0DFF20096B947 /* CreatePasscodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607E594125B0DFF20096B947 /* CreatePasscodeView.swift */; };
@@ -73,6 +74,7 @@
 		605C027324D89B6300FBD7DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6063582F24E321B500B7D78D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6070429625B9EFB700701597 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
+		6072151225FC1F020067903E /* PinnedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedView.swift; sourceTree = "<group>"; };
 		6073A36F2597212400D369A3 /* TrashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashView.swift; sourceTree = "<group>"; };
 		6073A377259734CC00D369A3 /* TrashedEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashedEntryView.swift; sourceTree = "<group>"; };
 		607E594125B0DFF20096B947 /* CreatePasscodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePasscodeView.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				60598B6524E1D8DD00A36C62 /* RowView.swift */,
 				60356CED24DC658B00DC25C4 /* HomeView.swift */,
 				6073A36F2597212400D369A3 /* TrashView.swift */,
+				6072151225FC1F020067903E /* PinnedView.swift */,
 				60356CEF24DC6B0E00DC25C4 /* DetailedEntryView.swift */,
 				6073A377259734CC00D369A3 /* TrashedEntryView.swift */,
 				6063582F24E321B500B7D78D /* SettingsView.swift */,
@@ -375,6 +378,7 @@
 				60F6706C25BD76C400FA2F2C /* SelectionView.swift in Sources */,
 				60356CF024DC6B0E00DC25C4 /* DetailedEntryView.swift in Sources */,
 				60598B6624E1D8DD00A36C62 /* RowView.swift in Sources */,
+				6072151325FC1F020067903E /* PinnedView.swift in Sources */,
 				6073A378259734CC00D369A3 /* TrashedEntryView.swift in Sources */,
 				6070429725B9EFB700701597 /* SearchBarView.swift in Sources */,
 				6073A3702597212400D369A3 /* TrashView.swift in Sources */,

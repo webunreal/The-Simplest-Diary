@@ -7,10 +7,9 @@
 //
 
 import SwiftUI
-
 @available(iOS 14.0, *)
+
 struct TrashView: View {
-    
     var body: some View {
         PageView(page: .trash)
     }
