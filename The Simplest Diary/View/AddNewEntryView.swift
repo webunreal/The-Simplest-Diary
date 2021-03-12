@@ -9,54 +9,58 @@
 import SwiftUI
 @available(iOS 14.0, *)
 struct AddNewEntryView: View {
+    @Environment(\.presentationMode) var presentation
     @Environment(\.managedObjectContext) var managedObjectContext
     @State private var entryText: String = "Write something..."
-    @Environment(\.presentationMode) var presentation
     private let placeholder = "Write something..."
     
     var body: some View {
         VStack {
             TextEditor(text: $entryText)
                 .autocapitalization(.sentences)
-                .foregroundColor(self.entryText == placeholder ? .gray : .primary)
+                .foregroundColor(entryText == placeholder ? .gray : .primary)
                 .onTapGesture {
-                    if self.entryText == placeholder {
-                        self.entryText = ""
+                    if entryText == placeholder {
+                        entryText = ""
                     }
                 }
                 .onChange(of: entryText, perform: { value in
-                    self.entryText = entryText
+                    entryText = entryText
                 })
         }
-        .navigationBarTitle("", displayMode: .inline)
-        .navigationBarItems(trailing: Button(action: {
-            saveEntry()
-        }) {
-            Text("Save")
-        })
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    saveEntry()
+                } label: {
+                    Text("Save")
+                }
+            }
+        }
         .padding()
     }
     
     private func saveEntry() {
-        if entryText.isEmpty {
-            self.presentation.wrappedValue.dismiss()
+        if entryText == placeholder {
+            presentation.wrappedValue.dismiss()
         } else {
-            let newEntry = Entry(context: self.managedObjectContext)
-            newEntry.id = UUID()
-            newEntry.text = entryText
-            newEntry.date = Date()
-            newEntry.isTrashed = false
-            newEntry.isSelected = false
-            
             saveContext()
-            
-            self.presentation.wrappedValue.dismiss()
+            presentation.wrappedValue.dismiss()
         }
     }
     
     private func saveContext() {
+        let newEntry = Entry(context: self.managedObjectContext)
+        newEntry.id = UUID()
+        newEntry.text = entryText
+        newEntry.date = Date()
+        newEntry.isTrashed = false
+        newEntry.isSelected = false
+        
         do {
             try managedObjectContext.save()
+            
         } catch {
             print("Error saving managed object context: \(error)")
         }

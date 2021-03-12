@@ -40,7 +40,7 @@ struct DetailedEntryView: View {
             Text(onEdit ? "Save" : "Edit")
         })
         .alert(isPresented: $showAlert) {
-                    Alert(title: Text("Do you want to save empty entry?"), primaryButton: .destructive(Text("Yes"), action: {
+                    Alert(title: Text("Do you want to save empty entry?"), primaryButton: .destructive(Text("Save"), action: {
                         entry.text = ""
                         saveContext()
                     }), secondaryButton: .cancel())

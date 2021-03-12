@@ -23,40 +23,40 @@ struct TrashedEntryView: View {
             Text(entry.text ?? "")
         }
         .padding()
-        .navigationBarTitle("", displayMode: .inline)
-        .navigationBarItems(
-            trailing:
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 40) {
-                    Button(action: {
-                        self.showAlertDeleteOneEntry = true
-                    }) {
+                    Button {
+                        showAlertDeleteOneEntry = true
+                    } label: {
                         Text("Delete")
                             .foregroundColor(.red)
                     }
-                    .alert(isPresented: $showAlertDeleteOneEntry) {
-                        Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Yes"), action: {
-                            deleteEntry()
-                            self.presentation.wrappedValue.dismiss()
-                        }), secondaryButton: .cancel())
-                    }
-                    Button(action: {
+                    Button {
                         recoverEntry()
-                        self.presentation.wrappedValue.dismiss()
-                    }) {
+                        presentation.wrappedValue.dismiss()
+                    } label: {
                         Text("Recover")
                     }
-                })
+                }
+            }
+        }
+        .alert(isPresented: $showAlertDeleteOneEntry) {
+            Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Delete"), action: {
+                deleteEntry()
+                presentation.wrappedValue.dismiss()
+            }), secondaryButton: .cancel())
+        }
     }
     
     private func deleteEntry() {
         self.managedObjectContext.delete(entry)
-        
         saveContext()
     }
     
     private func recoverEntry() {
         entry.isTrashed = false
-        
         saveContext()
     }
     

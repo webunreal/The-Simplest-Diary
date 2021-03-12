@@ -1,0 +1,35 @@
+/* 
+  Localizable.strings
+  The Simplest Diary
+
+  Created by Nikolai Ivanov on 11.03.2021.
+  Copyright © 2021 Nikolai Ivanov. All rights reserved.
+*/
+
+"Entries" = "Записи";
+"Trash" = "Корзина";
+"Settings" = "Настройки";
+"Error" = "Ошибка";
+"Delete this entry?" = "Удаить запись?";
+"Delete" = "Удалить";
+"Save" = "Сохранить";
+"Edit" = "Редактировать";
+"Do you want to save empty entry?" = "Сохранить пустую запись?";
+"Recover" = "Восстановить";
+"Passcode" = "Пароль";
+"Use Passcode" = "Использовать пароль";
+"Use " = "Использовать ";
+"Write something..." = "Напишите что-нибудь...";
+"No Entries" = "Нет записей";
+"Search" = "Поиск";
+"Cancel" = "Отмена";
+"Done" = "Готово";
+"Select" = "Выбрать";
+"Recover all" = "Восстановть все";
+"Delete all" = "Удалить все";
+"Delete selected entries from Trash?" = "Удалить выбранные записи из корзины?";
+"Delete all entries from Trash?" = "Удалить все записи из корзины?";
+"Passcodes are not the same" = "Пароли не совпадают";
+"Create passcode" = "Придумайте пароль";
+"Repeate passcode" = "Повторите пароль";
+"Enter passcode" = "Введите пароль";

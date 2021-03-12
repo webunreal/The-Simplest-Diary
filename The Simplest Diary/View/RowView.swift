@@ -16,9 +16,9 @@ struct RowView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @ObservedObject var entry: Entry
     
-    @Binding public var showingSelection: Bool
-    @State private var showDeletingAlert: Bool = false
-    @State private var showAlertDeleteOneEntry: Bool = false
+    @Binding var showingSelection: Bool
+    @Binding var showAlertDeleteOneEntry: Bool
+    @Binding var deleteOneEntryAlert: Alert?
     @State private var currentSwipeFrameWidth: CGFloat = 0
     
     public let page: Page
@@ -111,9 +111,14 @@ struct RowView: View {
                 case .home:
                     moveToTrash()
                 case.trash:
+                    deleteOneEntryAlert =  Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Delete"), action: {
+                        deleteEntryFromTrash()
+                    }), secondaryButton: .cancel() {
+                        currentSwipeFrameWidth = 0
+                        
+                    })
                     showAlertDeleteOneEntry = true
                 }
-                
             } label: {
                 Image(systemName: "trash")
                     .font(.title)
@@ -123,14 +128,6 @@ struct RowView: View {
             }
             .frame(width: currentSwipeFrameWidth)
             .background(Color.red)
-            .alert(isPresented: $showAlertDeleteOneEntry) {
-                Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Delete"), action: {
-                    deleteEntryFromTrash()
-                }), secondaryButton: .cancel() {
-                    currentSwipeFrameWidth = 0
-                    
-                })
-            }
         }
         .cornerRadius(15)
         .animation(.spring())

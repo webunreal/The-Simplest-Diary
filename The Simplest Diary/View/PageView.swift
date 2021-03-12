@@ -19,7 +19,10 @@ struct PageView: View {
     @State private var searchText = ""
     @State private var showingSelection: Bool = false
     
+    @State private var showAlertDeleteOneEntry: Bool = false
+    @State private var deleteOneEntryAlert: Alert?
     @State private var showDeletingAlert: Bool = false
+    @State private var showAddNewEntryView: Bool = false
     
     private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
@@ -34,7 +37,7 @@ struct PageView: View {
         }
     }
     
-    private var navigationBarTitle: String {
+    private var navigationBarTitle: LocalizedStringKey {
         switch page {
         case .home:
             return "Entries"
@@ -58,6 +61,7 @@ struct PageView: View {
         NavigationView {
             GeometryReader { geometry in
                 ScrollView(.vertical) {
+                    NavigationLink(destination: AddNewEntryView(), isActive: $showAddNewEntryView) {}.hidden()
                     // MARK: - SearchBarView
                     if !entries.isEmpty {
                         SearchBarView(searchText: $searchText)
@@ -70,7 +74,7 @@ struct PageView: View {
                                     guard let text = $0.text else { return false }
                                     
                                     return self.searchText.isEmpty ?
-                                        true : text.lowercased().contains(self.searchText.lowercased())
+                                        true : text.lowercased().contains(searchText.lowercased())
                                 },
                                 id: \.self) { entry in
                                 //MARK: - Content
@@ -79,7 +83,7 @@ struct PageView: View {
                                     NavigationLink(
                                         destination: DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")
                                     ) {
-                                        RowView(entry: entry, showingSelection: $showingSelection, page: page)
+                                        RowView(entry: entry, showingSelection: $showingSelection, showAlertDeleteOneEntry: $showAlertDeleteOneEntry, deleteOneEntryAlert: $deleteOneEntryAlert, page: page)
                                     }
                                     .padding(.bottom, 1)
                                     .buttonStyle(PlainButtonStyle())
@@ -88,7 +92,7 @@ struct PageView: View {
                                         destination:
                                             TrashedEntryView(entry: entry)
                                     ) {
-                                        RowView(entry: entry, showingSelection: $showingSelection, page: page)
+                                        RowView(entry: entry, showingSelection: $showingSelection, showAlertDeleteOneEntry: $showAlertDeleteOneEntry, deleteOneEntryAlert: $deleteOneEntryAlert, page: page)
                                     }
                                     .padding(.bottom, 1)
                                     .buttonStyle(PlainButtonStyle())
@@ -96,7 +100,7 @@ struct PageView: View {
                             }
                         }
                         .padding(.horizontal)
-                        .navigationBarTitle(navigationBarTitle)
+                        .navigationTitle(navigationBarTitle)
                         //MARK: - Navigation Bar Items
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
@@ -111,7 +115,6 @@ struct PageView: View {
                                 }
                             }
                             ToolbarItem(placement: .navigationBarTrailing) {
-                                EmptyView()
                                 switch page {
                                 case .home:
                                     if showingSelection {
@@ -123,8 +126,10 @@ struct PageView: View {
                                         }
                                         .disabled(!checkAtLeastOneIsSelected())
                                     } else  {
-                                        NavigationLink(destination: AddNewEntryView()) {
-                                            Image(systemName: "square.and.pencil")   
+                                        Button {
+                                            showAddNewEntryView = true
+                                        } label : {
+                                            Image(systemName: "square.and.pencil")
                                         }
                                         .disabled(!searchText.isEmpty)
                                     }
@@ -162,7 +167,7 @@ struct PageView: View {
                                 title:
                                     showingSelection ?
                                     Text("Delete selected entries from Trash?") :
-                                    Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Yes"), action: {
+                                    Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Delete"), action: {
                                         showingSelection ?
                                             deleteSelectedEntries() :
                                             deleteAllEntriesFromTrash()
@@ -171,12 +176,16 @@ struct PageView: View {
                                 secondaryButton: .cancel() { showingSelection = false }
                             )
                         }
+                        .alert(isPresented: $showAlertDeleteOneEntry) {
+                            guard let deleteOneEntryAlert = deleteOneEntryAlert else { return Alert(title: Text("Error")) }
+                            return deleteOneEntryAlert
+                        }
                     } else {
                         // MARK: - If there is no entry
                         NoEntriesView()
                             .frame(width: geometry.size.width)
                             .frame(minHeight: geometry.size.height)
-                            .navigationBarTitle(navigationBarTitle)
+                            .navigationTitle(navigationBarTitle)
                             .toolbar {
                                 ToolbarItem(placement: .navigationBarLeading) {
                                     EmptyView()
