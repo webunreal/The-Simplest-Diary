@@ -275,6 +275,8 @@ struct RowView: View {
                             currentEntryOffset = -swipeOptionsWidth
                             currentRightSwipeFrameWidth = swipeOptionsWidth
                         }
+                    } else {
+                        removeSwipes()
                     }
                 } else {
                     removeSwipes()
