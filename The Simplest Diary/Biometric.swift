@@ -9,7 +9,7 @@
 import Foundation
 import LocalAuthentication
 
-public struct Biometric {
+public enum Biometric {
     
     public enum BiometricType {
         case none
@@ -22,7 +22,7 @@ public struct Biometric {
         var error: NSError?
         
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            switch(context.biometryType) {
+            switch context.biometryType {
             case .none:
                 return .none
             case .touchID:

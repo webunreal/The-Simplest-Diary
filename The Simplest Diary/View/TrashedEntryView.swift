@@ -14,7 +14,7 @@ struct TrashedEntryView: View {
     @Environment(\.presentationMode) var presentation
     @Environment(\.managedObjectContext) var managedObjectContext
     @ObservedObject var entry: Entry
-    @State private var showAlertDeleteOneEntry: Bool = false
+    @State private var showDeleteOneEntryAlert: Bool = false
     
     private let haptic = UIImpactFeedbackGenerator(style: .soft)
     
@@ -28,7 +28,7 @@ struct TrashedEntryView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 40) {
                     Button {
-                        showAlertDeleteOneEntry = true
+                        showDeleteOneEntryAlert = true
                     } label: {
                         Text("Delete")
                             .foregroundColor(.red)
@@ -42,16 +42,18 @@ struct TrashedEntryView: View {
                 }
             }
         }
-        .alert(isPresented: $showAlertDeleteOneEntry) {
-            Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Delete"), action: {
-                deleteEntry()
-                presentation.wrappedValue.dismiss()
-            }), secondaryButton: .cancel())
+        .alert(isPresented: $showDeleteOneEntryAlert) {
+            Alert(
+                title: Text("Delete this entry?"),
+                primaryButton: .destructive(Text("Delete"), action: {
+                    deleteEntry()
+                    presentation.wrappedValue.dismiss()
+                }), secondaryButton: .cancel())
         }
     }
     
     private func deleteEntry() {
-        self.managedObjectContext.delete(entry)
+        managedObjectContext.delete(entry)
         saveContext()
     }
     
@@ -71,9 +73,9 @@ struct TrashedEntryView: View {
     }
 }
 
-//@available(iOS 14.0, *)
-//struct TrashedEntryView_Previews: PreviewProvider {
+// @available(iOS 14.0, *)
+// struct TrashedEntryView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        TrashedEntryView()
 //    }
-//}
+// }

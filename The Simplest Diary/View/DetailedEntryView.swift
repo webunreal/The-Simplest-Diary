@@ -15,16 +15,16 @@ struct DetailedEntryView: View {
     @ObservedObject var entry: Entry
     @State private var onEdit = false
     @State var entryText: String = ""
-    @State private var showAlert = false
+    @State private var showSavingEmptyEntryAlert = false
     
     var body: some View {
         VStack {
             if onEdit {
                 TextEditor(text: $entryText)
                     .autocapitalization(.sentences)
-                    .onChange(of: entryText, perform: { value in
-                        self.entryText = entryText
-                    })
+                    .onChange(of: entryText) { _ in
+                        entryText = entryText
+                    }
             } else {
                 ScrollView(.vertical) {
                     Text(entry.text ?? "Error")
@@ -32,19 +32,25 @@ struct DetailedEntryView: View {
             }
             Spacer()
         }
-        .navigationBarTitle("", displayMode: .inline)
-        .navigationBarItems(trailing: Button(action: {
-            self.onEdit.toggle()
-            self.onEdit ? editEntry() : saveEntry()
-        }) {
-            Text(onEdit ? "Save" : "Edit")
-        })
-        .alert(isPresented: $showAlert) {
-                    Alert(title: Text("Do you want to save empty entry?"), primaryButton: .destructive(Text("Save"), action: {
-                        entry.text = ""
-                        saveContext()
-                    }), secondaryButton: .cancel())
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    onEdit.toggle()
+                    onEdit ? editEntry() : saveEntry()
+                } label: {
+                    Text(onEdit ? "Save" : "Edit")
                 }
+            }
+        }
+        .alert(isPresented: $showSavingEmptyEntryAlert) {
+            Alert(
+                title: Text("Do you want to save empty entry?"),
+                primaryButton: .default(Text("Save"), action: {
+                    entry.text = ""
+                    saveContext()
+                }), secondaryButton: .cancel())
+        }
         .padding()
     }
     
@@ -57,7 +63,7 @@ struct DetailedEntryView: View {
             entry.text = entryText
             saveContext()
         } else {
-            self.showAlert = true
+            showSavingEmptyEntryAlert = true
         }
     }
     
@@ -68,13 +74,13 @@ struct DetailedEntryView: View {
             print("Error saving managed object context: \(error)")
         }
         
-        self.presentation.wrappedValue.dismiss()
+        presentation.wrappedValue.dismiss()
     }
 }
 
-//@available(iOS 14.0, *)
-//struct EntryView_Previews: PreviewProvider {
+// @available(iOS 14.0, *)
+// struct EntryView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        DetailedEntryView()
 //    }
-//}
+// }

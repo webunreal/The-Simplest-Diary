@@ -25,7 +25,6 @@
 		607E594225B0DFF20096B947 /* CreatePasscodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607E594125B0DFF20096B947 /* CreatePasscodeView.swift */; };
 		6089CDC825F16D680006C6F9 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6089CDC725F16D680006C6F9 /* PageView.swift */; };
 		608C8AE525952CF800AE023B /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608C8AE425952CF800AE023B /* AppTabView.swift */; };
-		608CAE6E25B23C8B00726DC1 /* ScrollViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608CAE6D25B23C8B00726DC1 /* ScrollViewExtension.swift */; };
 		6092B27825F2D1CE00838C95 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6092B27725F2D1CE00838C95 /* Page.swift */; };
 		60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 60AA5E9A25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld */; };
 		60AA5EE925A37CD4002D7786 /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AA5EE825A37CD4002D7786 /* HomeKit.framework */; };
@@ -80,7 +79,6 @@
 		607E594125B0DFF20096B947 /* CreatePasscodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePasscodeView.swift; sourceTree = "<group>"; };
 		6089CDC725F16D680006C6F9 /* PageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
 		608C8AE425952CF800AE023B /* AppTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabView.swift; sourceTree = "<group>"; };
-		608CAE6D25B23C8B00726DC1 /* ScrollViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewExtension.swift; sourceTree = "<group>"; };
 		6092B27725F2D1CE00838C95 /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		60AA5E9B25A372AC002D7786 /* TheSimplestDiary.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TheSimplestDiary.xcdatamodel; sourceTree = "<group>"; };
 		60AA5EE825A37CD4002D7786 /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = System/Library/Frameworks/HomeKit.framework; sourceTree = SDKROOT; };
@@ -208,7 +206,6 @@
 		608CAE7225B23D1100726DC1 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				608CAE6D25B23C8B00726DC1 /* ScrollViewExtension.swift */,
 				60C11E9725BA0B460093DBCA /* ViewExtension.swift */,
 			);
 			path = Extensions;
@@ -243,6 +240,7 @@
 				605C024824D89B6000FBD7DD /* Sources */,
 				605C024924D89B6000FBD7DD /* Frameworks */,
 				605C024A24D89B6000FBD7DD /* Resources */,
+				601E260825FD194700686E33 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -361,13 +359,32 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		601E260825FD194700686E33 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		605C024824D89B6000FBD7DD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */,
-				608CAE6E25B23C8B00726DC1 /* ScrollViewExtension.swift in Sources */,
 				6092B27825F2D1CE00838C95 /* Page.swift in Sources */,
 				6089CDC825F16D680006C6F9 /* PageView.swift in Sources */,
 				608C8AE525952CF800AE023B /* AppTabView.swift in Sources */,

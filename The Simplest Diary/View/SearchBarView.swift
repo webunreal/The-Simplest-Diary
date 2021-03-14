@@ -17,16 +17,17 @@ struct SearchBarView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .padding(.leading, 10)
-                TextField("Search", text: $searchText, onEditingChanged: { _ in
-                        self.showCancelButton = true
-                }).foregroundColor(.primary)
+                TextField("Search", text: $searchText) { _ in
+                    showCancelButton = true
+                }
+                .foregroundColor(.primary)
                 
-                Button(action: {
-                    self.searchText = ""
-                }) {
-                    Image(systemName: "xmark.circle.fill").opacity(searchText == "" ? 0 : 1)
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .opacity(searchText.isEmpty ? 0 : 1)
                         .padding(.trailing, 10)
-                        .animation(.easeInOut)
                 }
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
@@ -34,17 +35,16 @@ struct SearchBarView: View {
             .background(Color(.secondarySystemBackground))
             .cornerRadius(10)
             
-            if showCancelButton  {
+            if showCancelButton {
                 Button("Cancel") {
                     endEditing()
-                    self.searchText = ""
-                    self.showCancelButton = false
+                    searchText = ""
+                    showCancelButton = false
                 }
                 .foregroundColor(Color(.systemBlue))
             }
         }
         .padding()
-        .animation(.easeInOut)
     }
 }
 

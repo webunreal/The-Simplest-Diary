@@ -16,7 +16,7 @@ struct CreatePasscodeView: View {
     @AppStorage("passcode") private var passcode: String = ""
     @Environment(\.presentationMode) var presentation
     @Binding var isPasscodeUsed: Bool
-    @State private var count: Int = 0
+    @State private var counter: Int = 0
     @State private var firstEnteredPasscode: String = ""
     @State private var secondEnteredPasscode: String = ""
     @State private var isFirstFieldDotFilled = [Bool](repeating: false, count: 4)
@@ -29,7 +29,7 @@ struct CreatePasscodeView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack {
                     VStack {
-                        if self.isErrorTextShown {
+                        if isErrorTextShown {
                             Text("Passcodes are not the same")
                                 .foregroundColor(.red)
                                 .padding(.bottom, 20)
@@ -43,64 +43,64 @@ struct CreatePasscodeView: View {
                             }
                         }
                         .padding(.bottom, 20)
-                            Text("Repeate passcode")
-                                .padding(.bottom, 20)
-                                .opacity(self.isFirstFieldFilled ? 1 : 0)
-                                .animation(.spring())
-                            
-                            HStack {
-                                ForEach(1..<5) { index in
-                                    DotView(isFilled: isSecondFieldDotFilled[index - 1])
-                                        .animation(.spring())
-                                }
+                        Text("Repeate passcode")
+                            .padding(.bottom, 20)
+                            .opacity(isFirstFieldFilled ? 1 : 0)
+                            .animation(.spring())
+                        
+                        HStack {
+                            ForEach(1..<5) { index in
+                                DotView(isFilled: isSecondFieldDotFilled[index - 1])
+                                    .animation(.spring())
                             }
-                            .opacity(self.isFirstFieldFilled ? 1 : 0)
-                            .padding(.bottom, 5)
+                        }
+                        .opacity(isFirstFieldFilled ? 1 : 0)
+                        .padding(.bottom, 5)
                     }
                     Spacer()
                     VStack(spacing: 5) {
                         HStack(spacing: hStackSpacing) {
                             ForEach(1..<4) { number in
-                                Button(action: {
+                                Button {
                                     buttonTapped(number: number)
-                                }) {
+                                } label: {
                                     PasscodeButtonView(number: number)
                                 }
                             }
                         }
                         HStack(spacing: hStackSpacing) {
                             ForEach(4..<7) { number in
-                                Button(action: {
+                                Button {
                                     buttonTapped(number: number)
-                                }) {
+                                } label: {
                                     PasscodeButtonView(number: number)
                                 }
                             }
                         }
                         HStack(spacing: hStackSpacing) {
                             ForEach(7..<10) { number in
-                                Button(action: {
+                                Button {
                                     buttonTapped(number: number)
-                                }) {
+                                } label: {
                                     PasscodeButtonView(number: number)
                                 }
                             }
                         }
                         HStack(spacing: hStackSpacing) {
-                            Button(action: {
+                            Button {
                                 
-                            }) {
+                            } label: {
                                 PasscodeButtonView(number: 0)
                                     .hidden()
                             }
-                            Button(action: {
+                            Button {
                                 buttonTapped(number: 0)
-                            }) {
+                            } label: {
                                 PasscodeButtonView(number: 0)
                             }
-                            Button(action: {
+                            Button {
                                 deleteButton()
-                            }) {
+                            } label: {
                                 Image(systemName: "delete.left")
                                     .font(.system(size: 40))
                                     .foregroundColor(.primary)
@@ -119,7 +119,7 @@ struct CreatePasscodeView: View {
     }
     
     private func disablePasscode() {
-        self.isPasscodeUsed = false
+        isPasscodeUsed = false
     }
     
     private func buttonTapped(number: Int) {
@@ -131,81 +131,81 @@ struct CreatePasscodeView: View {
     }
     
     private func fillFirstField(number: Int) {
-        if self.count < 4 {
-            self.isFirstFieldDotFilled[self.count].toggle()
-            self.count += 1
-            self.firstEnteredPasscode += String(number)
+        if counter < 4 {
+            isFirstFieldDotFilled[counter].toggle()
+            counter += 1
+            firstEnteredPasscode += String(number)
             
-            if self.count == 4 {
-                self.isFirstFieldFilled = true
-                self.count = 0
+            if counter == 4 {
+                isFirstFieldFilled = true
+                counter = 0
             }
         }
     }
     
     private func fillSecondField(number: Int) {
-        if self.count < 4 {
-            self.isSecondFieldDotFilled[self.count].toggle()
-            self.count += 1
-            self.secondEnteredPasscode += String(number)
+        if counter < 4 {
+            isSecondFieldDotFilled[counter].toggle()
+            counter += 1
+            secondEnteredPasscode += String(number)
             
-            if self.count == 4 {
+            if counter == 4 {
                 checkPasscodes()
             }
         }
     }
     
     private func deleteButton() {
-        if self.isFirstFieldFilled {
-            if self.count > 0 {
-                self.count -= 1
-                self.isSecondFieldDotFilled[self.count].toggle()
-                self.secondEnteredPasscode = String(self.secondEnteredPasscode.dropLast())
+        if isFirstFieldFilled {
+            if counter > 0 {
+                counter -= 1
+                isSecondFieldDotFilled[counter].toggle()
+                secondEnteredPasscode = String(secondEnteredPasscode.dropLast())
                 
-                if self.count == 0 {
-                    self.count = 4
-                    self.isFirstFieldFilled = false
+                if counter == 0 {
+                    counter = 4
+                    isFirstFieldFilled = false
                 }
             } else {
-                self.count = 3
-                self.isFirstFieldFilled = false
-                self.isFirstFieldDotFilled[self.count].toggle()
-                self.firstEnteredPasscode = String(self.firstEnteredPasscode.dropLast())
+                counter = 3
+                isFirstFieldFilled = false
+                isFirstFieldDotFilled[counter].toggle()
+                firstEnteredPasscode = String(firstEnteredPasscode.dropLast())
             }
         } else {
-            if self.count > 0 {
-                self.count -= 1
-                self.isFirstFieldDotFilled[self.count].toggle()
-                self.firstEnteredPasscode = String(self.firstEnteredPasscode.dropLast())
+            if counter > 0 {
+                counter -= 1
+                isFirstFieldDotFilled[counter].toggle()
+                firstEnteredPasscode = String(firstEnteredPasscode.dropLast())
             }
         }
     }
     
     private func checkPasscodes() {
-        if self.firstEnteredPasscode == self.secondEnteredPasscode {
-            self.passcode = self.secondEnteredPasscode
-            self.isPasscodeUsed = true
-            self.presentation.wrappedValue.dismiss()
+        if firstEnteredPasscode == secondEnteredPasscode {
+            passcode = secondEnteredPasscode
+            isPasscodeUsed = true
+            presentation.wrappedValue.dismiss()
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
                 
                 withAnimation(.easeIn) {
-                    self.isErrorTextShown = true
+                    isErrorTextShown = true
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(.easeOut) {
-                        self.isErrorTextShown = false
+                        isErrorTextShown = false
                     }
                 }
                 
-                self.count = 0
-                self.isFirstFieldFilled = false
-                self.firstEnteredPasscode = ""
-                self.secondEnteredPasscode = ""
-                self.isFirstFieldDotFilled = [Bool](repeating: false, count: 4)
-                self.isSecondFieldDotFilled = [Bool](repeating: false, count: 4)
+                counter = 0
+                isFirstFieldFilled = false
+                firstEnteredPasscode = ""
+                secondEnteredPasscode = ""
+                isFirstFieldDotFilled = [Bool](repeating: false, count: 4)
+                isSecondFieldDotFilled = [Bool](repeating: false, count: 4)
             }
         }
     }

@@ -14,7 +14,7 @@ import LocalAuthentication
 struct PasscodeView: View {
     private let hStackSpacing: CGFloat = 30
     
-    @State private var count: Int = 0
+    @State private var counter: Int = 0
     @State private var isDotFilled = [Bool](repeating: false, count: 4)
     @State private var enteredPasscode: String = ""
     @AppStorage("passcode") private var passcode: String = ""
@@ -38,51 +38,51 @@ struct PasscodeView: View {
                     VStack(spacing: 10) {
                         HStack(spacing: hStackSpacing) {
                             ForEach(1..<4) { number in
-                                Button(action: {
+                                Button {
                                     buttonTapped(number: number)
-                                }) {
+                                } label: {
                                     PasscodeButtonView(number: number)
                                 }
                             }
                         }
                         HStack(spacing: hStackSpacing) {
                             ForEach(4..<7) { number in
-                                Button(action: {
+                                Button {
                                     buttonTapped(number: number)
-                                }) {
+                                } label: {
                                     PasscodeButtonView(number: number)
                                 }
                             }
                         }
                         HStack(spacing: hStackSpacing) {
                             ForEach(7..<10) { number in
-                                Button(action: {
+                                Button {
                                     buttonTapped(number: number)
-                                }) {
+                                } label: {
                                     PasscodeButtonView(number: number)
                                 }
                             }
                         }
                         HStack(spacing: hStackSpacing) {
-                            Button(action: {
-                                if (Biometric.biometricType != .none && self.isBiometricUsed) {
+                            Button {
+                                if Biometric.biometricType != .none && isBiometricUsed {
                                     authenticate()
                                 }
-                            }) {
+                            } label: {
                                 Image(systemName: Biometric.biometricImageName)
                                     .font(.system(size: 40))
                                     .foregroundColor(.primary)
                                     .frame(width: 80, height: 80)
-                                    .opacity((Biometric.biometricType != .none && self.isBiometricUsed) ? 1 : 0)
+                                    .opacity((Biometric.biometricType != .none && isBiometricUsed) ? 1 : 0)
                             }
-                            Button(action: {
+                            Button {
                                 buttonTapped(number: 0)
-                            }) {
+                            } label: {
                                 PasscodeButtonView(number: 0)
                             }
-                            Button(action: {
+                            Button {
                                 deleteButton()
-                            }) {
+                            } label: {
                                 Image(systemName: "delete.left")
                                     .font(.system(size: 40))
                                     .foregroundColor(.primary)
@@ -100,41 +100,41 @@ struct PasscodeView: View {
     }
     
     private func buttonTapped(number: Int) {
-        if self.count < 4 {
-            self.isDotFilled[self.count].toggle()
-            self.count += 1
-            self.enteredPasscode += String(number)
-            if self.count == 4 {
+        if counter < 4 {
+            isDotFilled[counter].toggle()
+            counter += 1
+            enteredPasscode += String(number)
+            if counter == 4 {
                 checkPasscode()
             }
         }
     }
     
     private func deleteButton() {
-        if self.count > 0 {
-            self.count -= 1
-            self.isDotFilled[self.count].toggle()
-            self.enteredPasscode = String(self.enteredPasscode.dropLast())
+        if counter > 0 {
+            counter -= 1
+            isDotFilled[counter].toggle()
+            enteredPasscode = String(enteredPasscode.dropLast())
         }
     }
     
     private func checkPasscode() {
-        if self.enteredPasscode == self.passcode {
-            self.isPasscodeCorrect = true
+        if enteredPasscode == passcode {
+            isPasscodeCorrect = true
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
                 
-                self.count = 0
-                self.isDotFilled = [Bool](repeating: false, count: 4)
-                self.enteredPasscode = ""
+                counter = 0
+                isDotFilled = [Bool](repeating: false, count: 4)
+                enteredPasscode = ""
             }
             
         }
     }
     
     private func authenticate() {
-        if !self.isBiometricUsed {
+        if !isBiometricUsed {
             return
         } else {
             let context = LAContext()
@@ -143,11 +143,11 @@ struct PasscodeView: View {
             if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
                 let reason = "Unlock the app"
                 
-                context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+                context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, _ in
                     DispatchQueue.main.async {
                         if success {
-                            self.isDotFilled = [true, true, true, true]
-                            self.isPasscodeCorrect = true
+                            isDotFilled = [Bool](repeating: true, count: 4)
+                            isPasscodeCorrect = true
                         } else {
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
                         }

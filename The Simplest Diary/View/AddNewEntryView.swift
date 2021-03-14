@@ -24,9 +24,9 @@ struct AddNewEntryView: View {
                         entryText = ""
                     }
                 }
-                .onChange(of: entryText, perform: { value in
+                .onChange(of: entryText) { _ in
                     entryText = entryText
-                })
+                }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -42,7 +42,7 @@ struct AddNewEntryView: View {
     }
     
     private func saveEntry() {
-        if entryText == placeholder {
+        if entryText == placeholder || entryText.isEmpty {
             presentation.wrappedValue.dismiss()
         } else {
             saveContext()

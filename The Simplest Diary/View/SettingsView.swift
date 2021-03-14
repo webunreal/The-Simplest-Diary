@@ -25,14 +25,14 @@ struct SettingsView: View {
                         Toggle(isOn: $isPasscodeUsed) {
                             Text("Use Passcode")
                         }
-                        .onChange(of: isPasscodeUsed, perform: { value in
+                        .onChange(of: isPasscodeUsed) { value in
                             if value {
-                                self.showCreatePasscodeView = true
+                                showCreatePasscodeView = true
                             } else {
-                                self.passcode = ""
-                                self.isBiometricUsed = false
+                                passcode = ""
+                                isBiometricUsed = false
                             }
-                        })
+                        }
                         
                         if Biometric.biometricType != .none && self.isPasscodeUsed && !self.passcode.isEmpty {
                             Toggle(isOn: $isBiometricUsed) {

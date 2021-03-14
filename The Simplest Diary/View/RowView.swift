@@ -19,8 +19,10 @@ struct RowView: View {
     @Binding var showingSelection: Bool
     @Binding var showAlertDeleteOneEntry: Bool
     @Binding var deleteOneEntryAlert: Alert?
+    
     @State private var currentRightSwipeFrameWidth: CGFloat = 0
     @State private var currentLeftSwipeFrameWidth: CGFloat = 0
+    @State private var currentEntryOffset: CGFloat = 0
     
     public let page: Page
     
@@ -60,6 +62,8 @@ struct RowView: View {
     
     var body: some View {
         HStack(spacing: 0) {
+            
+            // MARK: - Selection
             Button {
                 entry.isSelected.toggle()
             } label: {
@@ -69,102 +73,126 @@ struct RowView: View {
             }
             .frame(width: showingSelection ? selectionWidth : 0)
             
-            Button {
-                entry.isPinned.toggle()
-                currentLeftSwipeFrameWidth = 0
-            } label: {
-                Image(systemName: entry.isPinned ? "pin.slash.fill" : "pin.fill")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .opacity(currentLeftSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
-            }
-            .frame(width: currentLeftSwipeFrameWidth)
-            .background(Color.orange)
-            
-            VStack {
+            ZStack {
                 HStack(spacing: 0) {
-                    Text(entry.date ?? Date(), formatter: RowView.dateFormat)
-                        .font(.footnote)
-                        .lineLimit(1)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, minHeight: 15, alignment: .leading)
-                        .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
                     
+                    // MARK: - Pin
+                    if page != .trash {
+                        Button {
+                            pinEntry()
+                        } label: {
+                            Image(systemName: entry.isPinned ? "pin.slash.fill" : "pin.fill")
+                                .font(.title)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .opacity(currentLeftSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
+                        }
+                        .frame(maxWidth: currentLeftSwipeFrameWidth)
+                        .background(Color.orange)
+                    }
+                    
+                    Spacer()
+                    
+                    // MARK: - Recover
+                    if page == .trash {
+                        Button {
+                            recoverEntryFromTrash()
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.title)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .opacity(currentRightSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
+                        }
+                        .frame(width: currentRightSwipeFrameWidth)
+                        .background(Color.blue)
+                    }
+                    
+                    // MARK: - Delete
+                    Button {
+                        switch page {
+                        case .home:
+                            moveToTrash()
+                        case .pinned:
+                            moveToTrash()
+                        case.trash:
+                            deleteOneEntryAlert = Alert(
+                                title: Text("Delete this entry?"),
+                                primaryButton: .destructive(Text("Delete"), action: {
+                                    deleteEntryFromTrash()
+                                }), secondaryButton: .cancel() {
+                                    removeSwipes()
+                                    
+                                })
+                            showAlertDeleteOneEntry = true
+                        }
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .opacity(currentRightSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
+                    }
+                    .frame(maxWidth: currentRightSwipeFrameWidth)
+                    .background(Color.red)
+                }
+                
+                // MARK: - Body
+                VStack {
+                    HStack(spacing: 0) {
+                        Text(entry.date ?? Date(), formatter: RowView.dateFormat)
+                            .font(.footnote)
+                            .lineLimit(1)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, minHeight: 15, alignment: .leading)
+                            .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                        
                         Image(systemName: "pin.fill")
                             .foregroundColor(.orange)
+                            .rotationEffect(.degrees(45))
                             .opacity(entry.isPinned ? 1: 0)
                             .padding(.trailing, 15)
+                    }
+                    .background(
+                        Color(colorScheme == .dark ?
+                                .secondarySystemBackground :
+                                .systemFill)
+                    )
+                    
+                    Text(entry.text ?? "Error")
+                        .font(.system(size: 20))
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(5)
+                        .frame(maxWidth: .infinity, minHeight: entryHeight, alignment: .topLeading)
+                        .padding(EdgeInsets(top: 1, leading: 15, bottom: 10, trailing: 15))
                 }
-                .background(
-                    Color(colorScheme == .dark ?
-                            .secondarySystemBackground :
-                            .systemFill)
-                )
-                .cornerRadius(showingSelection ? 15 : 0, corners: [.topLeft])
-                
-                Text(entry.text ?? "Error")
-                    .font(.system(size: 20))
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(5)
-                    .frame(maxWidth: .infinity, minHeight: entryHeight, alignment: .topLeading)
-                    .padding(EdgeInsets(top: 1, leading: 15, bottom: 10, trailing: 15))
+                .background(Color("cardBackgroud"))
+                .offset(x: currentEntryOffset)
             }
-            .background(Color("cardBackgroud"))
-            .cornerRadius(showingSelection ? 15 : 0, corners: [.topLeft, .bottomLeft])
-            
-            if page == .trash {
-                Button {
-                    recoverEntryFromTrash()
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.title)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .opacity(currentRightSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
-                }
-                .frame(width: currentRightSwipeFrameWidth)
-                .background(Color.blue)
-            }
-            
-            Button {
-                switch page {
-                case .home:
-                    moveToTrash()
-                case .pinned:
-                    moveToTrash()
-                case.trash:
-                    deleteOneEntryAlert =  Alert(title: Text("Delete this entry?"), primaryButton: .destructive(Text("Delete"), action: {
-                        deleteEntryFromTrash()
-                    }), secondaryButton: .cancel() {
-                        currentRightSwipeFrameWidth = 0
-                        
-                    })
-                    showAlertDeleteOneEntry = true
-                }
-            } label: {
-                Image(systemName: "trash")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .opacity(currentRightSwipeFrameWidth > swipeOptionsWidth / 2 ? 1 : 0)
-            }
-            .frame(width: currentRightSwipeFrameWidth)
-            .background(Color.red)
+            .cornerRadius(15)
         }
-        .cornerRadius(15)
-        .animation(.spring())
+        .onAppear(perform: removeSwipes)
+        .animation(.easeIn(duration: 0.1))
         .onChange(of: showingSelection) { _ in
-            currentRightSwipeFrameWidth = 0
+            removeSwipes()
         }
-        .gesture(DragGesture(minimumDistance: 30)
+        .gesture(DragGesture(minimumDistance: 20)
                     .onChanged { value in
-                        swipeOnChanged(value: value)
+                        if abs(value.location.y - value.startLocation.y) < 10 {
+                            swipeOnChanged(swipe: value.location.x - value.startLocation.x)
+                        }
                     }
                     .onEnded {value in
-                        swipeOnEnded(value: value)
+                        swipeOnEnded(swipe: value.location.x - value.startLocation.x)
                     }
         )
+    }
+    
+    private func pinEntry() {
+        haptic.impactOccurred()
+        entry.isPinned.toggle()
+        saveContext()
+        removeSwipes()
     }
     
     private func moveToTrash() {
@@ -193,47 +221,79 @@ struct RowView: View {
         }
     }
     
-    private func swipeOnChanged(value: DragGesture.Value) {
+    private func swipeOnChanged(swipe: CGFloat) {
         if !showingSelection {
-            if value.translation.width < 0 && currentLeftSwipeFrameWidth == 0 {
-                if value.translation.width < -swipeOptionsWidth {
-                    currentRightSwipeFrameWidth = swipeOptionsWidth
-                } else {
-                    currentRightSwipeFrameWidth = -value.translation.width
-                }
-            } else if value.translation.width > 0 && currentRightSwipeFrameWidth == 0 {
-                if value.translation.width > swipeOptionsWidth {
-                    currentLeftSwipeFrameWidth = swipeOptionsWidth
-                } else {
-                    currentLeftSwipeFrameWidth = value.translation.width
+            if swipe > 0 {
+                if currentRightSwipeFrameWidth == 0 && page != .trash {
+                    currentEntryOffset = swipe
+                    currentLeftSwipeFrameWidth = swipe
+                } 
+            } else if swipe < 0 {
+                if currentLeftSwipeFrameWidth == 0 {
+                    if page == .trash {
+                        if -swipe > swipeOptionsWidth {
+                            currentEntryOffset = 2 * -swipeOptionsWidth
+                            currentRightSwipeFrameWidth = swipeOptionsWidth
+                        } else {
+                            currentEntryOffset = 2 * swipe
+                            currentRightSwipeFrameWidth = -swipe
+                        }
+                    } else {
+                        currentEntryOffset = swipe
+                        currentRightSwipeFrameWidth = -swipe
+                    }
                 }
             }
         }
     }
     
-    private func swipeOnEnded(value: DragGesture.Value) {
+    private func swipeOnEnded(swipe: CGFloat) {
         if !showingSelection {
-            if value.translation.width < 0 {
-                if currentLeftSwipeFrameWidth == 0 {
-                    currentRightSwipeFrameWidth = swipeOptionsWidth
+            if swipe > 0 {
+                if currentRightSwipeFrameWidth == 0 && page != .trash {
+                    if swipe > 3 * swipeOptionsWidth {
+                        pinEntry()
+                    } else if swipe > swipeOptionsWidth {
+                        currentEntryOffset = swipeOptionsWidth
+                        currentLeftSwipeFrameWidth = swipeOptionsWidth
+                    } else {
+                        removeSwipes()
+                    }
                 } else {
-                    currentLeftSwipeFrameWidth = 0
+                    removeSwipes()
                 }
-            } else if value.translation.width > 0 {
-                if currentRightSwipeFrameWidth == 0 {
-                    currentLeftSwipeFrameWidth = swipeOptionsWidth
+            } else if swipe < 0 {
+                if currentLeftSwipeFrameWidth == 0 {
+                    if -swipe > 3 * swipeOptionsWidth && page != .trash {
+                        moveToTrash()
+                        removeSwipes()
+                    } else if -swipe > swipeOptionsWidth {
+                        if page == .trash {
+                            currentEntryOffset = 2 * -swipeOptionsWidth
+                            currentRightSwipeFrameWidth = swipeOptionsWidth
+                        } else {
+                            currentEntryOffset = -swipeOptionsWidth
+                            currentRightSwipeFrameWidth = swipeOptionsWidth
+                        }
+                    }
                 } else {
-                    currentRightSwipeFrameWidth = 0
+                    removeSwipes()
                 }
             }
         }
     }
+    
+    private func removeSwipes() {
+        currentRightSwipeFrameWidth = 0
+        currentLeftSwipeFrameWidth = 0
+        currentEntryOffset = 0
+    }
 }
 
-//@available(iOS 14.0, *)
-//struct RowView_Previews: PreviewProvider {
+// @available(iOS 14.0, *)
+// struct RowView_Previews: PreviewProvider {
 //    static var previews: some View {
 //        RowView(entry: Entry(), page: .home)
 //           .environment(\.colorScheme, .dark)
 //    }
-//}
+// }

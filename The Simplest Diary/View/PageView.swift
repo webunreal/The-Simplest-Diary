@@ -51,7 +51,7 @@ struct PageView: View {
         }
     }
     
-    private var columns: [GridItem]  {
+    private var columns: [GridItem] {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return [
                 GridItem(.flexible()),
@@ -67,11 +67,13 @@ struct PageView: View {
             GeometryReader { geometry in
                 ScrollView(.vertical) {
                     NavigationLink(destination: AddNewEntryView(), isActive: $showAddNewEntryView) {}.hidden()
+                    
                     // MARK: - SearchBarView
                     if !entries.isEmpty {
                         SearchBarView(searchText: $searchText)
                             .opacity(self.showingSelection ? 0 : 1)
                             .animation(.easeInOut)
+                        
                         // MARK: - LazyVGrid
                         LazyVGrid(columns: columns) {
                             ForEach(
@@ -82,13 +84,20 @@ struct PageView: View {
                                         true : text.lowercased().contains(searchText.lowercased())
                                 },
                                 id: \.self) { entry in
-                                //MARK: - Content
+                                
+                                // MARK: - Content
                                 switch page {
                                 case .home:
                                     NavigationLink(
                                         destination: DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")
                                     ) {
-                                        RowView(entry: entry, showingSelection: $showingSelection, showAlertDeleteOneEntry: $showAlertDeleteOneEntry, deleteOneEntryAlert: $deleteOneEntryAlert, page: page)
+                                        RowView(
+                                            entry: entry,
+                                            showingSelection: $showingSelection,
+                                            showAlertDeleteOneEntry: $showAlertDeleteOneEntry,
+                                            deleteOneEntryAlert: $deleteOneEntryAlert,
+                                            page: page
+                                        )
                                     }
                                     .padding(.bottom, 1)
                                     .buttonStyle(PlainButtonStyle())
@@ -96,7 +105,13 @@ struct PageView: View {
                                     NavigationLink(
                                         destination: DetailedEntryView(entry: entry, entryText: entry.text ?? "Error")
                                     ) {
-                                        RowView(entry: entry, showingSelection: $showingSelection, showAlertDeleteOneEntry: $showAlertDeleteOneEntry, deleteOneEntryAlert: $deleteOneEntryAlert, page: page)
+                                        RowView(
+                                            entry: entry,
+                                            showingSelection: $showingSelection,
+                                            showAlertDeleteOneEntry: $showAlertDeleteOneEntry,
+                                            deleteOneEntryAlert: $deleteOneEntryAlert,
+                                            page: page
+                                        )
                                     }
                                     .padding(.bottom, 1)
                                     .buttonStyle(PlainButtonStyle())
@@ -105,7 +120,13 @@ struct PageView: View {
                                         destination:
                                             TrashedEntryView(entry: entry)
                                     ) {
-                                        RowView(entry: entry, showingSelection: $showingSelection, showAlertDeleteOneEntry: $showAlertDeleteOneEntry, deleteOneEntryAlert: $deleteOneEntryAlert, page: page)
+                                        RowView(
+                                            entry: entry,
+                                            showingSelection: $showingSelection,
+                                            showAlertDeleteOneEntry: $showAlertDeleteOneEntry,
+                                            deleteOneEntryAlert: $deleteOneEntryAlert,
+                                            page: page
+                                        )
                                     }
                                     .padding(.bottom, 1)
                                     .buttonStyle(PlainButtonStyle())
@@ -114,7 +135,8 @@ struct PageView: View {
                         }
                         .padding(.horizontal)
                         .navigationTitle(navigationBarTitle)
-                        //MARK: - Navigation Bar Items
+                        
+                        // MARK: - Navigation Bar Items
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 if page != .pinned {
@@ -140,10 +162,10 @@ struct PageView: View {
                                             Image(systemName: "trash")
                                         }
                                         .disabled(!checkAtLeastOneIsSelected())
-                                    } else  {
+                                    } else {
                                         Button {
                                             showAddNewEntryView = true
-                                        } label : {
+                                        } label: {
                                             Image(systemName: "square.and.pencil")
                                         }
                                         .disabled(!searchText.isEmpty)
@@ -176,28 +198,29 @@ struct PageView: View {
                                         Image(systemName: "ellipsis.circle")
                                             .disabled(showingSelection && !checkAtLeastOneIsSelected())
                                     }
+                                    .alert(isPresented: $showDeletingAlert) {
+                                        Alert(
+                                            title:
+                                                showingSelection ?
+                                                Text("Delete selected entries from Trash?") :
+                                                Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Delete"), action: {
+                                                    showingSelection ?
+                                                        deleteSelectedEntries() :
+                                                        deleteAllEntriesFromTrash()
+                                                    showingSelection = false
+                                                }),
+                                            secondaryButton: .cancel() { showingSelection = false }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                        .alert(isPresented: $showDeletingAlert) {
-                            Alert(
-                                title:
-                                    showingSelection ?
-                                    Text("Delete selected entries from Trash?") :
-                                    Text("Delete all entries from Trash?"), primaryButton: .destructive(Text("Delete"), action: {
-                                        showingSelection ?
-                                            deleteSelectedEntries() :
-                                            deleteAllEntriesFromTrash()
-                                        showingSelection = false
-                                    }),
-                                secondaryButton: .cancel() { showingSelection = false }
-                            )
                         }
                         .alert(isPresented: $showAlertDeleteOneEntry) {
                             guard let deleteOneEntryAlert = deleteOneEntryAlert else { return Alert(title: Text("Error")) }
                             return deleteOneEntryAlert
                         }
                     } else {
+                        
                         // MARK: - If there is no entry
                         NoEntriesView()
                             .frame(width: geometry.size.width)
@@ -222,13 +245,13 @@ struct PageView: View {
                             }
                     }
                 }
-                .fixFlickering()
+                .padding(.top, 0.5)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
-    //MARK: - Moving to Trash
+    // MARK: - Moving to Trash
     public func moveSelectedToTrash() {
         for entry in entries where entry.isSelected {
             entry.isTrashed = true
@@ -237,7 +260,7 @@ struct PageView: View {
         saveContext()
     }
     
-    //MARK: - Deleting
+    // MARK: - Deleting
     private func deleteSelectedEntries() {
         for entry in entries where entry.isSelected {
             self.managedObjectContext.delete(entry)
@@ -252,7 +275,7 @@ struct PageView: View {
         saveContext()
     }
     
-    //MARK: - Recovering
+    // MARK: - Recovering
     private func recoverSelectedEntries() {
         for entry in entries where entry.isSelected {
             entry.isTrashed = false
@@ -267,17 +290,15 @@ struct PageView: View {
         saveContext()
     }
     
-    //MARK: - Cheking Selection
+    // MARK: - Cheking Selection
     private func checkAtLeastOneIsSelected() -> Bool {
-        for entry in entries {
-            if entry.isSelected {
-                return true
-            }
+        for entry in entries where entry.isSelected {
+            return true
         }
         return false
     }
     
-    //MARK: - Saving Context
+    // MARK: - Saving Context
     private func saveContext() {
         haptic.impactOccurred()
         
