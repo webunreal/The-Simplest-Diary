@@ -15,7 +15,7 @@ struct PageView: View {
     public let page: Page
     
     @Environment(\.managedObjectContext) var managedObjectContext
-    @FetchRequest(entity: Entry.entity(), sortDescriptors: []) var fetchedEntries: FetchedResults<Entry>
+    @FetchRequest(fetchRequest: Entry.getEntryFetchRequest()) var fetchedEntries: FetchedResults<Entry>
     @State private var searchText = ""
     @State private var showingSelection: Bool = false
     
@@ -29,13 +29,13 @@ struct PageView: View {
     private var entries: [Entry] {
         switch page {
         case .home:
-            return fetchedEntries.filter { !$0.isTrashed }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
+            return fetchedEntries.filter { !$0.isTrashed && $0.date != nil }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
                 return date1 > date2 }
         case .pinned :
-            return fetchedEntries.filter { !$0.isTrashed && $0.isPinned }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
+            return fetchedEntries.filter { !$0.isTrashed && $0.isPinned && $0.date != nil }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
                 return date1 > date2 }
         case.trash:
-            return fetchedEntries.filter { $0.isTrashed }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
+            return fetchedEntries.filter { $0.isTrashed && $0.date != nil }.sorted { guard let date1 = $0.date, let date2 = $1.date else { return false }
                 return  date1 > date2 }
         }
     }
