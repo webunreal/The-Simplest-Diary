@@ -28,6 +28,7 @@
 		6092B27825F2D1CE00838C95 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6092B27725F2D1CE00838C95 /* Page.swift */; };
 		60A1201126187DE200EB62F4 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60A1201026187DE200EB62F4 /* CloudKit.framework */; };
 		60A1201C2618871600EB62F4 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A1201B2618871600EB62F4 /* Entry.swift */; };
+		60A1203E26189DB100EB62F4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60A1204026189DB100EB62F4 /* InfoPlist.strings */; };
 		60AA5E9C25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 60AA5E9A25A372AC002D7786 /* TheSimplestDiary.xcdatamodeld */; };
 		60AA5EE925A37CD4002D7786 /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AA5EE825A37CD4002D7786 /* HomeKit.framework */; };
 		60B81E2125FA9B9D00724734 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60B81E2325FA9B9D00724734 /* Localizable.strings */; };
@@ -85,6 +86,8 @@
 		60A1200C26187DC300EB62F4 /* Diary.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Diary.entitlements; sourceTree = "<group>"; };
 		60A1201026187DE200EB62F4 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		60A1201B2618871600EB62F4 /* Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
+		60A1203F26189DB100EB62F4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		60A1204126189DB400EB62F4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		60AA5E9B25A372AC002D7786 /* TheSimplestDiary.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TheSimplestDiary.xcdatamodel; sourceTree = "<group>"; };
 		60AA5EE825A37CD4002D7786 /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = System/Library/Frameworks/HomeKit.framework; sourceTree = SDKROOT; };
 		60B81E2225FA9B9D00724734 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -175,6 +178,7 @@
 				6092B27725F2D1CE00838C95 /* Page.swift */,
 				60F6707925BF3F6700FA2F2C /* Biometric.swift */,
 				60A1201B2618871600EB62F4 /* Entry.swift */,
+				60A1204026189DB100EB62F4 /* InfoPlist.strings */,
 				60B81E2325FA9B9D00724734 /* Localizable.strings */,
 				605C024F24D89B6000FBD7DD /* AppDelegate.swift */,
 				605C025124D89B6000FBD7DD /* SceneDelegate.swift */,
@@ -349,6 +353,7 @@
 				60B81E2125FA9B9D00724734 /* Localizable.strings in Resources */,
 				605C025924D89B6300FBD7DD /* Preview Assets.xcassets in Resources */,
 				605C025624D89B6300FBD7DD /* Assets.xcassets in Resources */,
+				60A1203E26189DB100EB62F4 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +461,15 @@
 				605C025B24D89B6300FBD7DD /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		60A1204026189DB100EB62F4 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				60A1203F26189DB100EB62F4 /* en */,
+				60A1204126189DB400EB62F4 /* ru */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		60B81E2325FA9B9D00724734 /* Localizable.strings */ = {

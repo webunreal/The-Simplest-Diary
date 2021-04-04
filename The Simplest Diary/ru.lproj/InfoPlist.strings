@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  The Simplest Diary
+
+  Created by Nikolai Ivanov on 03.04.2021.
+  Copyright © 2021 Nikolai Ivanov. All rights reserved.
+*/
+
+"CFBundleDisplayName" = "Дневник";
